@@ -6,7 +6,7 @@ from forms import ArrivalForm, CreateUserForm, LoginForm
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kbymaecc:hmiBfUsgWuKYu7elxc_Pt1-etdxWo-Md@bubble.db.elephantsql.com/kbymaecc'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
