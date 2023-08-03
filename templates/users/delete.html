@@ -1,0 +1,10 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}Delete User{% endblock %}
+{% block content %}
+<h2>Remove {{ soldier.username }}</h2>
+<p>This action cannot be undone.</p>
+<form method="POST">
+<button type="submit">Delete</button>
+</form>
+{% endblock %}
