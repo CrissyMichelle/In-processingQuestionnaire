@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Useful Resources{% endblock %}
+
+{% block content %}
+<h2>Useful Phone Numbers and Locations</h2>
+<ul>
+    <li>Transportation: 808-655-0389</li>
+    <li><a href="/directions/{{ end }}">Directions FROM Lyman Gate to Bldg. 1020</a></li>
+</ul>
+<br><br>
+<br><br>
+<form id="endpoint-form" method="POST">
+    <h2>>Where do you want to go?  You're starting from Lyman Gate!</h2>
+    <p>enter a city, state or Latitude,Longitude</p>
+    {{ form.hidden_tag() }}
+    {% for field in form
+        if field.widget.input_type != 'hidden' %}
+        <p>
+            <b>{{ field.label }}</b>
+            <p>{{ field }}
+            {% for error in field.errors %}
+                {{ error }}</p>
+            {% endfor %}
+     {% endfor %}
+     <button type="submit">Submit</button>
+</form>
+{% endblock %}

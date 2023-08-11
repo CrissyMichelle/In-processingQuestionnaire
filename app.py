@@ -2,7 +2,8 @@ from flask import Flask, session, render_template, redirect, flash, session, url
 from flask_debugtoolbar import DebugToolbarExtension
 from werkzeug.exceptions import Unauthorized
 from models import db, connect_db, NewSoldier, Soldier
-from forms import ArrivalForm, CreateUserForm, LoginForm
+from forms import ArrivalForm, CreateUserForm, LoginForm, EnterEndpointForm, CustomFieldParam
+import requests
 
 app = Flask(__name__)
 
@@ -151,3 +152,44 @@ def show_delete_page(username):
         return redirect("/login")
 
     return render_template("/users/delete.html", soldier=soldier)
+
+@app.route("/resources", methods=["GET", "POST"])
+def show_useful_links():
+    """Show page with links and API functionality"""
+
+    form = EnterEndpointForm()
+    if form.validate_on_submit():
+        end_point = form.end_point.data
+
+        return redirect(f"/directions/{end_point}")
+    
+    return render_template("links.html", form=form)
+
+
+@app.route("/directions/<end_point>")
+def get_directions(end_point):
+    """Use API to get directions from Lyman gate"""
+
+    api_key = "cvOfJcV2HKUwQJuDbj36BK7ZiirFN7n6"
+    url = f"https://www.mapquestapi.com/directions/v2/route"
+
+    Lyman = "21.4830,-158.0480"
+    Bldg1020 = "21.4977,-158.0681"
+    params = {
+        "key": api_key,
+        "from": Lyman,
+        "to": end_point,
+        "routeType": "fastest"
+    }
+
+
+
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    if response.status_code == 200 and data.get("route"):
+        directions = data["route"]["legs"][0]["maneuvers"]
+        return render_template("directions.html", directions=directions)
+    else:
+        error_message = "Unable to retrieve directions."
+        return render_template("directions.html", error_message=error_message)

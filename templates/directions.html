@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Directions{% endblock %}
+
+{% block content %}
+<h6>{{ directions }}</h6>
+<ul>
+    {% for maneuver in directions %}
+        <p> {{ maneuver.narrative }}</p>
+    {% endfor %}
+</ul>
+{% endblock %}
