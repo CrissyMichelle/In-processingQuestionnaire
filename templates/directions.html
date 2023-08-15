@@ -2,7 +2,8 @@
 {% block title %}Directions{% endblock %}
 
 {% block content %}
-<h6>{{ directions }}</h6>
+<h6>Navigation instructions to {{ end_point }}</h6>
+<hr><hr>
 <ul>
     {% for maneuver in directions %}
         <p> {{ maneuver.narrative }}</p>

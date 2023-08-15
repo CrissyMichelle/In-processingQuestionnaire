@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 app.config["SECRET_KEY"] = "psst420"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-debug = DebugToolbarExtension(app)
+# debug = DebugToolbarExtension(app)
 
 connect_db(app)
 db.create_all()
@@ -189,7 +189,7 @@ def get_directions(end_point):
 
     if response.status_code == 200 and data.get("route"):
         directions = data["route"]["legs"][0]["maneuvers"]
-        return render_template("directions.html", directions=directions)
+        return render_template("directions.html", directions=directions, end_point=end_point)
     else:
         error_message = "Unable to retrieve directions."
         return render_template("directions.html", error_message=error_message)
