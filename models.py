@@ -43,6 +43,10 @@ class Soldier(db.Model):
     password = db.Column(db.Text, nullable = False)
     email = db.Column(db.String(50), nullable = False)
 
+    # type = db.Column(db.Text, foreign_key(one single key represents multiple tables\
+    #                                       depending on UserType\
+    #                                         POLYMORPHIC))
+
 
     @classmethod
     def register(cls, username, pwd, email):
