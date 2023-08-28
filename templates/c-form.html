@@ -1,0 +1,32 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}In-Processing Questionnaire{% endblock %}
+{% block content %}
+<h3>
+    <p>For Replacement Company Cadre using this application:</p>
+</h3>    
+    <i><p>Please fill out and submit.</p></i>
+
+<form id="c-form" method="POST">
+    {{ form.hidden_tag() }}
+    {% for field in form
+        if field.widget.input_type != 'hidden' %}
+        <p>
+            <b>{{ field.label }}</b>
+                {% if field.sub_label %}
+                <p class="sub-label">{{ field.sub_label }}</p>
+                {% endif %}
+            <p>{{ field }}
+            {% for error in field.errors %}
+                {{ error }}</p>
+            {% endfor %}
+            <br><br>
+        </p>
+    {% endfor %}
+    <button type="submit">Submit</button>
+</form>
+<hr><hr><hr>
+<p>If you have any questions about this app please contact Lightning Labs Software Development Team.
+    SFC Crissy Cabrera at 757-575-7479 or crissy.m.cabrera.mil
+</p>
+{% endblock %}
