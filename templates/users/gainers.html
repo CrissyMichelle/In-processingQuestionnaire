@@ -1,0 +1,24 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}User Details{% endblock %}
+{% block content %}
+<h2>{{ soldier.rank_and_name }}, Representing a Receiving Unit</h2>
+<p>Rank: {{ soldier.gaining_user.rank }}</p>
+<p>First Name: {{ soldier.gaining_user.first_name }}</p>
+<p>Last Name: {{ soldier.gaining_user.last_name }}</p>
+<p>Role: {{ soldier.role }}</p>
+<p>email: {{ soldier.gaining_user.email }}</p>
+<p>phone: {{ soldier.gaining_user.phone_number }}</p>
+<p>Brigade: {{ soldier.BDE }}</p>
+<p>Battalion: {{ soldier.BN }}</p>
+<p>Unit: {{ soldier.unit }}</p>
+<br>
+<hr>
+
+<p>Username: {{ soldier.username }}</p>
+<div>
+    <p><a href="/logout">Logout</a></p>
+</div>
+<br>
+<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}">Delete account?</a></p>
+{% endblock %}

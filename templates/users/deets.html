@@ -3,15 +3,14 @@
 {% block title %}User Details{% endblock %}
 {% block content %}
 <h2>{{ soldier.rank_and_name }}, Replacement Company Details</h2>
-<p>Rank: {{ soldier.rank }}</p>
-<p>First Name: {{ soldier.first_name }}</p>
-<p>Last Name: {{ soldier.last_name }}</p>
-<p>email: {{ soldier.app_user.email }}</p>
-<p>phone: {{ soldier.phone_number }}</p>
+<p>Rank: {{ soldier.incoming_user.rank }}</p>
+<p>First Name: {{ soldier.incoming_user.first_name }}</p>
+<p>Last Name: {{ soldier.incoming_user.last_name }}</p>
+<p>email: {{ soldier.incoming_user.email }}</p>
+<p>phone: {{ soldier.incoming_user.phone_number }}</p>
 <p>Arrival Date: {{ soldier.arrival_datetime }}</p>
 <p>Report to Bldg 1020, @0845 on: {{ soldier.report_bldg1020 }}</p>
 <br>
-<p><a href="/resources">Resources!</a></p>
 <hr>
 
 <p>Username: {{ soldier.username }}</p>
