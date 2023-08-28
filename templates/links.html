@@ -4,24 +4,25 @@
 {% block content %}
 <h2>Useful Phone Numbers and Locations</h2>
 <ul>
-    <li>Transportation: 808-655-0389</li>
-    <li><a href="/directions/{{ end }}">Directions FROM Lyman Gate to Bldg. 1020</a></li>
+    <li>Shuttle Pick-up: 808-655-0389</li>
+    <li><a href="/directions?origin=Lyman%20Gate,%20HI&destination=Building+1020,+Menoher+Rd,+Schofield+Barracks+96857&mode=DRIVING">Directions FROM Lyman Gate to Bldg. 1020</a></li>
 </ul>
 <br><br>
 <br><br>
-<form id="endpoint-form" method="POST">
-    <h2>>Where do you want to go?  You're starting from Lyman Gate!</h2>
-    <p>enter a city, state or Latitude,Longitude</p>
+<form id="endpoint-form" action="{{ url_for('show_useful_links') }}" method="POST">
+    <h2>Where do you want to go? >> You're starting from Lyman Gate!</h2>
     {{ form.hidden_tag() }}
     {% for field in form
         if field.widget.input_type != 'hidden' %}
         <p>
             <b>{{ field.label }}</b>
-            <p>{{ field }}
+            <p>{{ field(id=field.name) }}
             {% for error in field.errors %}
                 {{ error }}</p>
             {% endfor %}
+        </p>
      {% endfor %}
      <button type="submit">Submit</button>
 </form>
+<script src="{{ url_for('static', filename='resources.js') }}"></script>
 {% endblock %}
