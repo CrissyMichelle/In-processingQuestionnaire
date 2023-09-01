@@ -57,7 +57,7 @@ reacher = Cadre(id=64888999, role='commander', username=captain.username)
 oneal = GainingUser(id=9999999, BDE='3IBCT', BN='3-4CAV', role="squad leader", username=april.username)
 # Link the inheriting objects with the base class.  SQLA takes care of all the details!
 snuffle.newSoldier_id = snuffy.id
-wardawg.incoming_user = warrior
+wardawg.newSoldier_id = warrior.id
 captain.cadre_id = reacher.id
 april.gainUnit_userid = oneal.id
 # Add and commit NewSoldier, Cadre, and GainingUser objects
