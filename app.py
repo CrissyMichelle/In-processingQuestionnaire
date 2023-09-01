@@ -1,20 +1,22 @@
 from flask import Flask, session, render_template, redirect, flash, session, url_for, request, jsonify, current_app
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from key import GOOGLE_MAPS_KEY
+from key import GOOGLE_MAPS_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
 from forms import ArrivalForm, CreateUserForm, LoginForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm
-import requests
-import logging, datetime, traceback, sys, pdb
+import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
+import pandas as pd
+from openpyxl import Workbook
 
 logging.basicConfig(level=logging.INFO)
 
 
 app = Flask(__name__)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://kbymaecc:hmiBfUsgWuKYu7elxc_Pt1-etdxWo-Md@bubble.db.elephantsql.com/kbymaecc'
+# app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
@@ -22,6 +24,15 @@ app.config['SQLALCHEMY_ECHO'] = True
 app.config["SECRET_KEY"] = "psst420"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
+
+app.config['MAIL_SERVER'] = '127.0.0.1'
+app.config['MAIL_PORT'] = '1025'
+app.config['MAIL_USERNAME'] = 'crissymichelle@proton.me'
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
+mail = Mail(app)
 
 connect_db(app)
 db.create_all()
@@ -94,6 +105,44 @@ def login_form():
         
     return render_template("login.html", form=form)
 
+@app.route("/send_email")
+def send_email():
+    """Send email to logged in cadre member"""
+
+    if "username" not in session:
+        # raise Unauthorized()
+        return redirect("/register")
+    
+    username = session['username']
+    cadre_user = User.query.filter(User.username == username).one()
+
+    if cadre_user.type == 'cadre' and cadre_user.cadre.role == 'OPS SGT':
+        cadre_member = cadre_user.email
+        # Retrieve data from incoming users in the User class
+        user_data = User.query.filter_by(type='incoming').all()
+        # Convert user data into a pandas data frame
+        user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
+                                 user.phone_number, user.incoming.arrival_datetime) for user in user_data],
+                                 columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date'])
+        # Create excel file
+        excel_path = 'user_data.xlsx'
+        user_df.to_excel(excel_path, index=False)
+    else:
+        flash("You are not authorized to use this button!")
+        return redirect("/directions")
+
+    msg = Message('Incoming REPLCo Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+    msg.body = "See attached for incoming personnel data"
+    with app.open_resource(excel_path) as fp:
+        msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+    mail.send(msg)
+
+    # Clean up by removing the excel file after sending
+    os.remove(excel_path)
+
+    flash('Email sent!')
+    return redirect(f"users/cadre/{session['username']}")
+
 @app.route("/logout")
 def logout():
     """Clears the browser session of username and redirects after grabbing logout time"""
@@ -113,7 +162,8 @@ def page_for_inproc_users():
     """Show and handle Replacement Company's incoming personnel questionaire"""
     # but first, make sure only logged in users can get here
     if "username" not in session:
-        raise Unauthorized()
+        # raise Unauthorized()
+        return redirect("/register")
 
     form = ArrivalForm()
 
@@ -167,7 +217,8 @@ def page_for_gaining_users():
     """Show and handle form for users receiving personnel"""
     # but first, make sure only logged in users can get here
     if "username" not in session:
-        raise Unauthorized()
+        # raise Unauthorized()
+        return redirect("/register")
 
     form = GainersForm()
 
@@ -223,7 +274,8 @@ def page_for_cadre_users():
     """Show and handle form for Replacement Company cadre users"""
     # but first, make sure only logged in users can get here
     if "username" not in session:
-        raise Unauthorized()
+        # raise Unauthorized()
+        return redirect("/register")
 
     form = CadreForm()
 
@@ -275,8 +327,8 @@ def page_for_cadre_users():
 def show_user_deets(username):
     """Info page for logged-in-users"""
     if "username" not in session or username != session['username']:
-        raise Unauthorized()
-    
+        # raise Unauthorized()
+        return redirect("/register")
     s = User.query.filter(User.username == username).one()
     soldier = s.incoming
     return render_template("users/deets.html", soldier=soldier)
@@ -285,8 +337,8 @@ def show_user_deets(username):
 def show_gaining_user(username):
     """Info page for logged-in g-users"""
     if "username" not in session or username != session['username']:
-        raise Unauthorized()
-    
+        # raise Unauthorized()
+        return redirect("/register")
     g = User.query.filter(User.username == username).one()
     gaining_unit_user = g.gainers
     return render_template("users/gainers.html", soldier=gaining_unit_user)
@@ -295,8 +347,8 @@ def show_gaining_user(username):
 def show_cadre_user(username):
     """Info page for logged-in cadre members"""
     if "username" not in session or username != session['username']:
-        raise Unauthorized()
-    
+        # raise Unauthorized()
+        return redirect("/register")
     c = User.query.filter(User.username == username).one()
     cadre_user = c.cadre
     return render_template("users/cadre.html", soldier=cadre_user)
@@ -306,7 +358,7 @@ def show_delete_page(username):
     """Show page for deletion based on logged in username in session"""
     if "username" not in session or username != session['username']:
          raise Unauthorized()
-     
+
     s = User.query.filter(User.username == username).one()
     soldier = s.incoming
     # if POST request, we'll go ahead and delete the user
@@ -328,7 +380,6 @@ def show_useful_links():
         if form.validate_on_submit():
             end_point = form.destination.data
             return jsonify(success=True)
-        #     return redirect("/directions?origin=Lyman Gate, HI&destination=" + end_point + "&mode=DRIVING")
         else:
             return jsonify(success=False, error="Form not validated")
     
@@ -356,7 +407,7 @@ def show_get_directions():
 
     start = request.args.get('origin', 'Lyman Gate, HI')
     end = request.args.get('destination', '')
-    mode = request.args.get('mode', 'DRIVING')
+    mode = request.args.get('mode', 'WALKING')
 
     form = GetDirectionsForm()
     return render_template("directions.html", origin=start, destination=end, mode=mode, form=form)
@@ -406,5 +457,6 @@ def show_user(user_id):
 
     messages = (Messages.query.filter(Messages.user_id == user_id)
                 .order_by(Messages.timestamp.desc()).all())
+    likes = [message.id for message in user.likes]
     
-    return render_template('users/show.html', user=user, messages=messages)
+    return render_template('users/show.html', user=user, messages=messages, likes=likes)

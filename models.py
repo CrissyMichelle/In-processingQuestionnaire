@@ -24,7 +24,7 @@ class User(db.Model):
     phone_number = db.Column(db.String)
     image_url = db.Column(
         db.Text,
-        default="/static/images/default-pic.png",
+        default="/static/REPLCO_logo.png",
     )
     bio = db.Column(db.Text)
     last_login = db.Column(db.DateTime)
