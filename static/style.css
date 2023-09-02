@@ -19,3 +19,16 @@ h1 {
 .single-message {
     color: black;
 }
+
+#demo-banner {
+    background-color: red;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 18px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
