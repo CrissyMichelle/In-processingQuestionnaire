@@ -42,7 +42,8 @@ class ArrivalForm(FlaskForm):
     l_name = StringField("Last Name:", validators=[InputRequired()])
 
     # Report date
-    report = HTML5DateField('Report at 0845 hrs on [select a date] to Building 1020, Schofield Barracks, Hawaii 96857', validators=[DataRequired()])
+    report = HTML5DateField('Report at 0845 hrs on below date to Building 1020, Schofield Barracks, Hawaii 96857.  If the date auto-populates with 11/10/2027 please select the Monday immediately following your arrival date.  Call Replacement Company CQ Desk with any questions.',
+                            validators=[DataRequired()])
 
     # Telephonic recall
     telephone = StringField('2.Contact Phone Number (XXX-XXX-XXXX):',
@@ -50,7 +51,7 @@ class ArrivalForm(FlaskForm):
 
     # First blocks for initials
     tele_recall = CustomFieldParam('2 HOUR TELEPHONIC RECALL', sub_label='While Assigned to U.S. Army Hawaii Reception Company, you may be contacted telephonically.  This ensures all Cadre members are able to contact you for accountability and in case any emergency situation may arise. (Initials)',
-                              validators=[DataRequired(), Regexp(r'^[A-Z]{2,4}$', message="Please enter 2 to 3 uppercase letters as initials.")
+                              validators=[DataRequired(), Regexp(r'^[A-Z]{2,4}$', message="Please enter your initials as 2 uppercase letters.")
     ])
     in_proc_hours = CustomFieldParam('3.IN PROCESSING HOURS', sub_label='Your place of duty throughout the week is detailed in the attached weekly schedule that you have received.  All Soldiers will attend all briefs and mandatory events.  Appointments will not be made that conflict with the installation in-processing timeline, Monday through Thursday. (Initials)',
                                 validators=[DataRequired(), Regexp(r'^[A-Z]{2,4}$', message="Please enter 2 to 3 uppercase letters as initials.")
