@@ -67,6 +67,24 @@ class NewSoldier(db.Model):
     arrival_datetime = db.Column(db.DateTime, nullable = False)
     report_bldg1020 = db.Column(db.Date)
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
+
+    # Initialed fields for accountability
+    tele_recall = db.Column(db.Text)
+    in_proc_hours = db.Column(db.Text)
+    new_pt = db.Column(db.Text)
+    uniform = db.Column(db.Text)
+    transpo = db.Column(db.Text)
+
+    orders = db.Column(db.Text)
+    da31 = db.Column(db.Text)
+    pov = db.Column(db.Text)
+    flight = db.Column(db.Text)
+    mypay = db.Column(db.Text)
+
+    tdy = db.Column(db.Text)
+    gtc = db.Column(db.Text)
+    tla = db.Column(db.Text)
+    hotels = db.Column(db.Text)
     
     def __repr__(self):
         """dunder method for easy representation of incoming Soldier object"""

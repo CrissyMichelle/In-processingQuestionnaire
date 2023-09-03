@@ -122,8 +122,25 @@ def send_email():
         user_data = User.query.filter_by(type='incoming').all()
         # Convert user data into a pandas data frame
         user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
-                                 user.phone_number, user.incoming.arrival_datetime) for user in user_data],
-                                 columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date'])
+                                 user.phone_number, user.incoming.arrival_datetime,
+                                user.incoming.tele_recall,
+                                user.incoming.in_proc_hours,
+                                user.incoming.new_pt,
+                                user.incoming.uniform,
+                                user.incoming.transpo,
+                                user.incoming.orders,
+                                user.incoming.da31,
+                                user.incoming.pov,
+                                user.incoming.flight,
+                                user.incoming.mypay,
+                                user.incoming.tdy,
+                                user.incoming.gtc,
+                                user.incoming.tla,
+                                user.incoming.hotels) for user in user_data],
+                                 columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date',
+                                          'tele_recall', 'in_proc_hours', 'new_pt', 'uniform', 'transpo',
+                                          'orders', 'da31', 'pov', 'flight', 'mypay', 'tdy', 'gtc',
+                                          'tla', 'hotels'])
         # Create excel file
         excel_path = 'user_data.xlsx'
         user_df.to_excel(excel_path, index=False)
@@ -181,9 +198,38 @@ def page_for_inproc_users():
         report = form.report.data
         # Telephonic recall
         telephone = form.telephone.data
+        # Initial blocks
+        tele_recall     = form.tele_recall.data
+        in_proc_hours   = form.in_proc_hours.data
+        new_pt          = form.new_pt.data
+        uniform         = form.uniform.data
+        transpo         = form.transpo.data
+        orders          = form.orders.data
+        da31            = form.da31.data
+        pov             = form.pov.data
+        flight          = form.flight.data
+        mypay           = form.mypay.data
+        tdy             = form.tdy.data
+        gtc             = form.gtc.data
+        tla             = form.tla.data
+        hotels          = form.hotels.data
         
         # add newly-arrived Soldier data into database 
-        new_arrived = NewSoldier(arrival_datetime = datetime, report_bldg1020 = report, username = incoming_user.username)
+        new_arrived = NewSoldier(arrival_datetime = datetime, report_bldg1020 = report, username = incoming_user.username,
+                                tele_recall     = tele_recall,
+                                in_proc_hours   = in_proc_hours,
+                                new_pt          = new_pt,
+                                uniform         = uniform,
+                                transpo         = transpo,
+                                orders          = orders,
+                                da31            = da31,
+                                pov             = pov,
+                                flight          = flight,
+                                mypay           = mypay,
+                                tdy             = tdy,
+                                gtc             = gtc,
+                                tla             = tla,
+                                hotels          = hotels)
         db.session.add(new_arrived)
         try:
             db.session.commit()
