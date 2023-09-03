@@ -28,20 +28,16 @@ Likes.query.delete()
 
 # Create base User objects
 snuffle = User(username='snuffle23', password ='passWORD!!123', email="joe.q.snuffy.mil@army.mil", type="incoming",
-               rank='PVT', first_name="Joe",
-                    last_name="Snuffy", phone_number='555-666-7474')
+               rank='PVT', first_name="Joe", last_name="Snuffy", phone_number='555-666-7474')
 
 wardawg = User(username='wardawg', password ='killKillKILL', email="claude.v.dayum.mil@army.mil", type="incoming",
-               rank='SSG', first_name="Claude",
-                    last_name="Dayum")
+               rank='SSG', first_name="Claude", last_name="Dayum")
 
 captain = User(username='cptO3', password ='cpt03', email="jack.b.reacher.mil@army.mil", type="cadre",
-               rank='CPT', first_name="Jack",
-                    last_name="Reacher", phone_number='808-555-6464')
+               rank='CPT', first_name="Jack", last_name="Reacher", phone_number='808-555-6464')
 
 april = User(username='aprilmay93', password ='sfc23', email="april.o.neal.mil@army.mil", type="gainers",
-               rank='SSG', first_name="April",
-                    last_name="ONeal", phone_number='610-999-0990')
+               rank='SSG', first_name="April", last_name="ONeal", phone_number='610-999-0990')
 
 # Add and commit the base User objects
 db.session.add(snuffle)
@@ -51,8 +47,36 @@ db.session.add(april)
 db.session.commit()
 
 # Create sample personnel objects linked to pre-committed base User objects
-snuffy = NewSoldier(id=10986474, arrival_datetime=datetime(2023, 8, 1, 6, 1), username=snuffle.username)
-warrior = NewSoldier(id=28034500, arrival_datetime=datetime(2023, 8, 4, 4), username=wardawg.username)
+snuffy = NewSoldier(id=10986474, arrival_datetime=datetime(2023, 8, 1, 6, 1), username=snuffle.username,
+    tele_recall = 'JS',
+    in_proc_hours = 'JS',
+    new_pt = 'JS',
+    uniform = 'JS',
+    transpo = 'JS',
+    orders = 'JS',
+    da31 = 'JS',
+    pov = 'JS',
+    flight = 'JS',
+    mypay = 'JS',
+    tdy = 'JS',
+    gtc = 'JS',
+    tla = 'JS',
+    hotels = 'JS')
+warrior = NewSoldier(id=28034500, arrival_datetime=datetime(2023, 8, 4, 4), username=wardawg.username,
+    tele_recall = 'CD',
+    in_proc_hours = 'CD',
+    new_pt = 'CD',
+    uniform = 'CD',
+    transpo = 'CD',
+    orders = 'CD',
+    da31 = 'CD',
+    pov = 'CD',
+    flight = 'CD',
+    mypay = 'CD',
+    tdy = 'CD',
+    gtc = 'CD',
+    tla = 'CD',
+    hotels = 'CD')
 reacher = Cadre(id=64888999, role='commander', username=captain.username)
 oneal = GainingUser(id=9999999, BDE='3IBCT', BN='3-4CAV', role="squad leader", username=april.username)
 # Link the inheriting objects with the base class.  SQLA takes care of all the details!
