@@ -2,10 +2,28 @@
 const arrivalDateTimeInput = document.getElementById('datetime');
 const reportDateInput = document.getElementById('report');
 
-const mondays = [[2023, 9,11], [2023, 9,18], [2023, 9,25], [2023, 10,2], [2023, 10,2],
-    [2023, 10,10], [2023, 10,16], [2023, 10,23], [2023, 10,30], [2023, 11,6], [2023, 11,14],
-    [2023, 11,20], [2023, 11, 27], [2023, 12,4], [2023, 12,4], [2023, 12,11], [2023, 12,18],
-    [2023, 12,26]]
+const holidayMons = [[2023, 10,9], [2023, 11,13], [2023, 12,25]]
+
+function isHoliday(dateArray, holidayArray) {
+    for (const holiday of holidayArray) {
+        if (dateArray[0]===holiday[0] && dateArray[1]===holiday[1] && dateArray[2]===holiday[2]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getNextMonday(date = new Date()) {
+    const dateCopy = new Date(date.getTime());
+
+    const nextMonday = new Date(
+        dateCopy.setDate(
+            dateCopy.getDate() + ((7 - dateCopy.getDay() + 1) % 7 || 7),
+        ),
+    );
+
+    return nextMonday;    
+}
 
 arrivalDateTimeInput.addEventListener('change', () => {
     //Grab the selected arrival datetimegroup and put into array as [YYYY, MM, DD]
@@ -15,15 +33,20 @@ arrivalDateTimeInput.addEventListener('change', () => {
     //Set the report date to the following Monday and accommodate WTForms date format
     let nextReport = determineReport(arrivalDate);
     reportDateInput.value = formatDate(nextReport);
-})
+});
 
 function determineReport(arrivalDate) {
-    for (const monday of mondays) {
-        if (arrivalDate[1] === monday[1] && arrivalDate[2] < monday[2]) {
-            return monday;
-        }
+    const arrivalDateTime = new Date(arrivalDate[0], arrivalDate[1] - 1, arrivalDate[2]);
+    let nextMonday = getNextMonday(arrivalDateTime);
+
+    let nextReportDate = [nextMonday.getFullYear(), nextMonday.getMonth() + 1, nextMonday.getDate()];
+    // Check if selected report date is a holiday
+    if (isHoliday(nextReportDate, holidayMons)) {
+        nextMonday.setDate(nextMonday.getDate() + 1); //Move the report date to Tuesday
+        nextReportDate = [nextMonday.getFullYear(), nextMonday.getMonth() + 1, nextMonday.getDate()];
     }
-    return [2027, 11, 10];
+
+    return nextReportDate;
 }
 
 function formatDate(dateArray) {

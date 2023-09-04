@@ -3,17 +3,20 @@
 {% block title %}User Details{% endblock %}
 {% block content %}
 <h2>{{ soldier.rank_and_name }}, Replacement Company Cadre Member</h2>
+<p><img src="{{ soldier.cadre_user.image_url }}"</p>
 <p>Rank: {{ soldier.cadre_user.rank }}</p>
 <p>First Name: {{ soldier.cadre_user.first_name }}</p>
 <p>Last Name: {{ soldier.cadre_user.last_name }}</p>
 <p>Role: {{ soldier.role }}</p>
 <p>email: {{ soldier.cadre_user.email }}</p>
 <p>phone: {{ soldier.cadre_user.phone_number }}</p>
+<p>Bio: {{ soldier.cadre_user.bio }}</p>
 <br>
 <hr>
 
 <p>Username: {{ soldier.username }}</p>
 <div>
+    <p><a href="/users/edit/{{ soldier.username }}">Edit Profile</a></p>
     <p><a href="/logout">Logout</a></p>
 </div>
 <br>
