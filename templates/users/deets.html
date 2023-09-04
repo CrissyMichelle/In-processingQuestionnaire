@@ -3,6 +3,7 @@
 {% block title %}User Details{% endblock %}
 {% block content %}
 <h2>{{ soldier.rank_and_name }}, Replacement Company Details</h2>
+<p><img src="{{ soldier.incoming_user.image_url }}"</p>
 <p>Rank: {{ soldier.incoming_user.rank }}</p>
 <p>First Name: {{ soldier.incoming_user.first_name }}</p>
 <p>Last Name: {{ soldier.incoming_user.last_name }}</p>
@@ -11,10 +12,12 @@
 <p>Arrival Date: {{ soldier.arrival_datetime }}</p>
 <p>Report to Bldg 1020, @0845 on: {{ soldier.report_bldg1020 }}</p>
 <br>
+<p>Bio: {{ soldier.incoming_user.bio }}</p>
 <hr>
 
 <p>Username: {{ soldier.username }}</p>
 <div>
+    <p><a href="/users/edit/{{ soldier.username }}">Edit Profile</a></p>
     <p><a href="/logout">Logout</a></p>
 </div>
 <br>

@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from key import GOOGLE_MAPS_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
-from forms import ArrivalForm, CreateUserForm, LoginForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -40,7 +40,10 @@ db.create_all()
 @app.route("/")
 def to_register():
     """Redirects to page with registration form"""
-    return redirect("/register")
+    if "username" in session:
+        return redirect("/users/profile")
+    else:
+        return redirect("/register")
 
 @app.route("/register", methods=["GET", "POST"])
 def signup_form():
@@ -48,7 +51,7 @@ def signup_form():
     # but first, logged in users can't create a new user
     if "username" in session:
         flash(f"You can create a new user. But {session['username']} must logout first!")
-        return redirect(f"/users/{session['username']}")
+        return redirect("/users/profile")
     
     form = CreateUserForm()
 
@@ -138,9 +141,9 @@ def send_email():
                                 user.incoming.tla,
                                 user.incoming.hotels) for user in user_data],
                                  columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date',
-                                          'tele_recall', 'in_proc_hours', 'new_pt', 'uniform', 'transpo',
-                                          'orders', 'da31', 'pov', 'flight', 'mypay', 'tdy', 'gtc',
-                                          'tla', 'hotels'])
+                                          'Tele_recall', 'In_proc_Hours', 'new_pt', 'Duty_Uniform', 'Transpo',
+                                          'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
+                                          'TLA', 'Hotels'])
         # Create excel file
         excel_path = 'user_data.xlsx'
         user_df.to_excel(excel_path, index=False)
@@ -398,6 +401,64 @@ def show_cadre_user(username):
     c = User.query.filter(User.username == username).one()
     cadre_user = c.cadre
     return render_template("users/cadre.html", soldier=cadre_user)
+
+@app.route("/users/profile")
+def show_profile_page():
+    """Redirect to user's profile details"""
+    if "username" in session:
+        username = session['username']
+        u = User.query.filter(User.username == username).one()
+
+        if u.type == "incoming":
+            return redirect(f"/users/{username}")
+        elif u.type == "gainers":
+            return redirect(f"/users/gaining/{username}")
+        else:
+            return redirect(f"/users/cadre/{username}")
+        
+    else:
+        return redirect("/register")
+
+@app.route("/users/edit/<username>", methods=["GET", "POST"])
+def edit_profile(username):
+    """Update profile for current user"""
+    if "username" not in session or username != session['username']:
+        return redirect("/register")
+    u = User.query.filter(User.username == username).one()
+
+    form = EditUserForm()
+    if form.validate_on_submit():
+        editing_user = User.authenticate(u.username, form.password.data)
+        if editing_user:
+            try:
+                editing_user = User.query.get(u.id)
+
+                if form.email.data:    
+                    editing_user.email=form.email.data
+                if form.rank.data:    
+                    editing_user.rank=form.rank.data
+                if form.f_name.data:    
+                    editing_user.first_name=form.f_name.data
+                if form.l_name.data:    
+                    editing_user.last_name=form.l_name.data
+                if form.ph_number.data:    
+                    editing_user.phone_number=form.ph_number.data
+                if form.image_url.data:
+                    editing_user.image_url=form.image_url.data
+                if form.bio.data:
+                    editing_user.bio=form.bio.data
+
+                db.session.commit()
+                return redirect("/users/profile")
+                
+            except IntegrityError: 
+                flash("Issue with form validation", 'danger')                      
+                return render_template("users/edit.html", form=form)            
+        flash("Bad Password", 'danger')
+        return redirect("/")
+    
+    else:
+        return render_template("users/edit.html", form=form, soldier=u)
 
 @app.route("/users/<username>/delete", methods=["GET", "POST"])
 def show_delete_page(username):

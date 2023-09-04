@@ -58,6 +58,10 @@ class User(db.Model):
             return s
         else:
             return False
+        
+    @property
+    def rank_and_name(self):
+        return self.rank + " " + self.last_name
 
 class NewSoldier(db.Model):
     """Models a new in-processing Soldier and inherits from User"""
