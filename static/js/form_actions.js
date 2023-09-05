@@ -83,74 +83,18 @@ function addInitialsValidator(inputId) {
 ['tele_recall', 'in_proc_hours','new_pt','uniform','transpo',
 'orders','da31','pov','flight','mypay', 'tdy','gtc','tla','hotels'].forEach(addInitialsValidator);
 
-/* The following very non-DontRepeatYourself code inspired the above. Try and eliminate the sopping wet stuff lol.
-const tele_recallInput = document.getElementById('tele_recall');
-tele_recallInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
+// implement "auto dashing" to phone number fields
+document.addEventListener("DOMContentLoaded", () => {
+    let phInput = document.getElementById("telephone");
 
-    const isValid = tele_recallInput.value.toUpperCase() === userInitials;
-    
-    tele_recallInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
+    phInput.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/[^\d]/g, ""); // removes all non-digits
 
-const in_proc_hoursInput = document.getElementById('in_proc_hours');
-in_proc_hoursInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
-
-    const isValid = in_proc_hoursInput.value.toUpperCase() === userInitials;
-    
-    in_proc_hoursInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
-const new_ptInput = document.getElementById('new_pt');
-new_ptInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
-
-    const isValid = new_ptInput.value.toUpperCase() === userInitials;
-    
-    new_ptInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
-const uniformInput = document.getElementById('uniform');
-uniformInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
-
-    const isValid = uniformInput.value.toUpperCase() === userInitials;
-    
-    uniformInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
-const transpoInput = document.getElementById('transpo');
-transpoInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
-
-    const isValid = transpoInput.value.toUpperCase() === userInitials;
-    
-    transpoInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
-
-const ordersInput = document.getElementById('orders');
-ordersInput.addEventListener('input', () => {
-    const f_initial = f_nameInput.value.charAt(0);
-    const l_initial = l_nameInput.value.charAt(0);
-    const userInitials = (f_initial + l_initial).toUpperCase();
-
-    const isValid = ordersInput.value.toUpperCase() === userInitials;
-    
-    ordersInput.setCustomValidity(isValid ?
-        '' : 'Invalid initials. Please enter two capital letters matching your first and last initials.');
-})
-
-... etc...*/
+        if (value.length > 3 && value.length <= 6) {
+            value = value.slice(0, 3) + "-" + value.slice(3);
+        } else if (value.length > 6) {
+            value = value.slice(0, 3) + "-" + value.slice(3,6) + "-" + value.slice(6, 10);
+        }
+        e.target.value = value;
+    });
+});

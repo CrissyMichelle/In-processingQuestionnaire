@@ -11,9 +11,33 @@
 <p>email: {{ soldier.cadre_user.email }}</p>
 <p>phone: {{ soldier.cadre_user.phone_number }}</p>
 <p>Bio: {{ soldier.cadre_user.bio }}</p>
+<p>Last Login: {{ soldier.cadre_user.last_login }}</p>
 <br>
 <hr>
-
+<p>Need a Spreadsheet?
+<!-- Button to open send_email Modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mailModal">
+    Get an email!
+    </button>
+</p>
+<!-- The email Modal -->
+<div class="modal" id="mailModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Authorize Access</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                {% include 'send_email.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
 <p>Username: {{ soldier.username }}</p>
 <div>
     <p><a href="/users/edit/{{ soldier.username }}">Edit Profile</a></p>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, TimeField, StringField, SelectField, PasswordField, BooleanField, ValidationError, TextAreaField
+from wtforms import DateField, TimeField, StringField, SelectField, PasswordField, BooleanField, ValidationError, TextAreaField, SubmitField
 from wtforms.validators import InputRequired, Regexp, DataRequired, Length, Email
 from wtforms.widgets import Input
 
@@ -42,7 +42,7 @@ class ArrivalForm(FlaskForm):
     l_name = StringField("Last Name:", validators=[InputRequired()])
 
     # Report date
-    report = HTML5DateField('Report at 0845 hrs on auto-populated date to Building 1020, Schofield Barracks, Hawaii 96857. Call Replacement Company CQ Desk with any questions.',
+    report = HTML5DateField('Report at 0845 hrs on date below (auto-populated) to Building 1020, Menoher Rd, Schofield Barracks, Hawaii 96857.',
                             validators=[DataRequired()])
 
     # Telephonic recall
@@ -172,8 +172,14 @@ class EditUserForm(FlaskForm):
     rank = StringField('Rank')
     f_name = StringField('First Name')
     l_name = StringField('Last Name')
-    ph_number = StringField('Phone Number')
+    telephone = StringField('Phone Number')
     image_url = StringField('Profile Pic url')
     bio = StringField('Bio')
     
     password = PasswordField('Password', validators=[Length(min=6)])
+
+class AuthGetEmail(FlaskForm):
+    """Form authorizing email with spreadsheet"""
+
+    code = PasswordField("Enter access code", validators=[DataRequired()])
+    submit = SubmitField("Email spreadsheet")

@@ -2,10 +2,11 @@ from flask import Flask, session, render_template, redirect, flash, session, url
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from key import GOOGLE_MAPS_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
-from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -108,7 +109,7 @@ def login_form():
         
     return render_template("login.html", form=form)
 
-@app.route("/send_email")
+@app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     """Send email to logged in cadre member"""
 
@@ -119,49 +120,59 @@ def send_email():
     username = session['username']
     cadre_user = User.query.filter(User.username == username).one()
 
-    if cadre_user.type == 'cadre' and cadre_user.cadre.role == 'OPS SGT':
-        cadre_member = cadre_user.email
-        # Retrieve data from incoming users in the User class
-        user_data = User.query.filter_by(type='incoming').all()
-        # Convert user data into a pandas data frame
-        user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
-                                 user.phone_number, user.incoming.arrival_datetime,
-                                user.incoming.tele_recall,
-                                user.incoming.in_proc_hours,
-                                user.incoming.new_pt,
-                                user.incoming.uniform,
-                                user.incoming.transpo,
-                                user.incoming.orders,
-                                user.incoming.da31,
-                                user.incoming.pov,
-                                user.incoming.flight,
-                                user.incoming.mypay,
-                                user.incoming.tdy,
-                                user.incoming.gtc,
-                                user.incoming.tla,
-                                user.incoming.hotels) for user in user_data],
-                                 columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date',
-                                          'Tele_recall', 'In_proc_Hours', 'new_pt', 'Duty_Uniform', 'Transpo',
-                                          'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
-                                          'TLA', 'Hotels'])
-        # Create excel file
-        excel_path = 'user_data.xlsx'
-        user_df.to_excel(excel_path, index=False)
-    else:
-        flash("You are not authorized to use this button!")
-        return redirect("/directions")
+    form = AuthGetEmail()
+    entered_code = None
+    correct_code = "25IDfy24OK"
 
-    msg = Message('Incoming REPLCo Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
-    msg.body = "See attached for incoming personnel data"
-    with app.open_resource(excel_path) as fp:
-        msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
-    mail.send(msg)
+    if form.validate_on_submit():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            # Retrieve data from incoming users in the User class
+            user_data = User.query.filter(and_(User.type == 'incoming', User.incoming.has(NewSoldier.arrival_datetime != None))).all()
+            # Convert user data into a pandas data frame
+            user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
+                                    user.phone_number, user.incoming.arrival_datetime,
+                                    user.incoming.tele_recall,
+                                    user.incoming.in_proc_hours,
+                                    user.incoming.new_pt,
+                                    user.incoming.uniform,
+                                    user.incoming.transpo,
+                                    user.incoming.orders,
+                                    user.incoming.da31,
+                                    user.incoming.pov,
+                                    user.incoming.flight,
+                                    user.incoming.mypay,
+                                    user.incoming.tdy,
+                                    user.incoming.gtc,
+                                    user.incoming.tla,
+                                    user.incoming.hotels) for user in user_data],
+                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date',
+                                            'Tele_recall', 'In_proc_Hours', 'Newcomer_PT', 'Duty_Uniform', 'Transpo',
+                                            'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
+                                            'TLA', 'Hotels'])
+            # Create excel file
+            excel_path = 'user_data.xlsx'
+            user_df.to_excel(excel_path, index=False)
 
-    # Clean up by removing the excel file after sending
-    os.remove(excel_path)
+            cadre_member = cadre_user.email
 
-    flash('Email sent!')
-    return redirect(f"users/cadre/{session['username']}")
+            msg = Message('Incoming REPLCo Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+            msg.body = "See attached for incoming personnel data"
+            with app.open_resource(excel_path) as fp:
+                msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+            mail.send(msg)
+
+            # Clean up by removing the excel file after sending
+            os.remove(excel_path)
+
+            flash('Email sent!')
+            return redirect(f"users/cadre/{session['username']}")
+        else:
+            flash("Bad access code.")
+            return redirect(f"users/cadre/{session['username']}")
+    
+    return render_template("send_email.html", form=form)
 
 @app.route("/logout")
 def logout():
@@ -171,6 +182,7 @@ def logout():
 
         s = User.query.filter(User.username == username).one()
         s.last_login = datetime.utcnow()
+        db.session.commit()
         
         session.pop("username")
         return redirect("/login")
@@ -400,7 +412,10 @@ def show_cadre_user(username):
         return redirect("/register")
     c = User.query.filter(User.username == username).one()
     cadre_user = c.cadre
-    return render_template("users/cadre.html", soldier=cadre_user)
+
+    form = AuthGetEmail()
+
+    return render_template("users/cadre.html", soldier=cadre_user, form=form)
 
 @app.route("/users/profile")
 def show_profile_page():
@@ -441,8 +456,8 @@ def edit_profile(username):
                     editing_user.first_name=form.f_name.data
                 if form.l_name.data:    
                     editing_user.last_name=form.l_name.data
-                if form.ph_number.data:    
-                    editing_user.phone_number=form.ph_number.data
+                if form.telephone.data:    
+                    editing_user.phone_number=form.telephone.data
                 if form.image_url.data:
                     editing_user.image_url=form.image_url.data
                 if form.bio.data:

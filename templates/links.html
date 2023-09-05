@@ -4,26 +4,63 @@
 {% block content %}
 <h2>Useful Phone Numbers and Locations</h2>
 <ul>
+    <li>Replacement Company CQ Desk, Bldg. 1020: 808-655-0389
+        <p></p>
+    </li>
+    <li>Military Personnel Division, Soldier Support Center: 808-655-1272
+        <p>9006-9008 Betsy Ross Ct, Schofield Barracks, HI 96857</p>
+    </li>
+    <li>Desmond T. Doss Health Clinic (DDHC) Appointments: 888-683-2778
+        <p>683 Waianae Ave BLDG G, Schofield Barracks, HI 96786</p>
+    </li>
+    <li>Central Issue Facility (CIF): 808-655-9876
+        <p>540 Humphreys Rd building 2070, Schofield Barracks, HI 96857</p>
+    </li>
+    <li>The Inn at Schofield: 808-624-9650
+        <p>563 Kolekole Ave, Wahiawa, HI 96786</p>
+    </li>
+    <li>Sustainment Bistro Warrior Restaurant (DFAC): Bldg 780
+        <p>780 Menoher Rd, Schofield Barracks, HI 96857</p>
+    </li>
     <li>Shuttle Pick-up: 808-655-0389</li>
     <li><a href="/directions?origin=Lyman%20Gate,%20HI&destination=Building+1020,+Menoher+Rd,+Schofield+Barracks+96857&mode=WALKING">Directions FROM Lyman Gate to Bldg. 1020</a></li>
 </ul>
 <br><br>
 <br><br>
-<form id="endpoint-form" action="{{ url_for('show_useful_links') }}" method="POST">
-    <h2>Where do you want to go? >> You're starting from Lyman Gate!</h2>
-    {{ form.hidden_tag() }}
-    {% for field in form
-        if field.widget.input_type != 'hidden' %}
-        <p>
-            <b>{{ field.label }}</b>
-            <p>{{ field(id=field.name) }}
-            {% for error in field.errors %}
-                {{ error }}</p>
-            {% endfor %}
-        </p>
-     {% endfor %}
-     <button type="submit">Submit</button>
-</form>
-<p>Want to send an email? <a href="/send_email">E-mail Me!</a></p>
+<p>Need different directions?
+    <!-- Button to open send_email Modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mapModal">
+        Click Here
+        </button>
+    </p>
+<div class="modal" id="mapModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Where do you want to go? >>> You're starting from Lyman Gate!</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                <form id="endpoint-form" action="{{ url_for('show_useful_links') }}" method="POST">
+                    {{ form.hidden_tag() }}
+                    {% for field in form
+                        if field.widget.input_type != 'hidden' %}
+                        <p>
+                            <b>{{ field.label }}</b>
+                            <p>{{ field(id=field.name) }}
+                            {% for error in field.errors %}
+                                {{ error }}</p>
+                            {% endfor %}
+                        </p>
+                    {% endfor %}
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="{{ url_for('static', filename='js/resources.js') }}"></script>
 {% endblock %}

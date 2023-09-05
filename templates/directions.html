@@ -6,9 +6,9 @@
 
 
 <div id="map"></div>
-
+<h2><p>Complimentary Navigation Service</p></h2>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD1qM67LtjsTauU9GN2ATfHgNKIPuI8HY&callback=initMap"></script>
-<div>
+<div class="form-container">
     <form id="get-directions" method="POST">
         {{ form.hidden_tag() }}
         {% for field in form

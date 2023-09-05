@@ -3,29 +3,32 @@
 {% block title %}Edit User{% endblock %}
 {% block content %}
 <h2>{{ soldier.rank_and_name }}, Edit Your Profile</h2>
-<form method="POST" id="edit_user">
-    {{ form.hidden_tag() }}
+<div class="form-container">
+  <form method="POST" id="edit_user">
+      {{ form.hidden_tag() }}
 
-    {% for field in form if field.widget.input_type != 'hidden' and field.name != 'password' %}
-      {% for error in field.errors %}
-        <span class="text-danger">{{ error }}</span>
+      {% for field in form if field.widget.input_type != 'hidden' and field.name != 'password' %}
+        {% for error in field.errors %}
+          <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+        {{ field(placeholder=field.label.text, class="form-control") }}
       {% endfor %}
-      {{ field(placeholder=field.label.text, class="form-control") }}
-    {% endfor %}
 
-    <p>To confirm changes, enter your password:</p>
-    {% if form.password.errors %}
-      {% for error in form.password.errors %}
-        <span class="text-danger">
-        {{ error }}
-      </span>
-      {% endfor %}
-    {% endif %}
-    {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
+      <p>To confirm changes, enter your password:</p>
+      {% if form.password.errors %}
+        {% for error in form.password.errors %}
+          <span class="text-danger">
+          {{ error }}
+        </span>
+        {% endfor %}
+      {% endif %}
+      {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
 
-    <div class="edit-btn-area">
-      <button class="btn btn-success">Edit this user!</button>
-      <a href="/users/{{ soldier.id }}" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-</form>
+      <div class="edit-btn-area">
+        <button class="btn btn-success">Edit this user!</button>
+        <a href="/users/{{ soldier.id }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+  </form>
+</div>
+<script src="{{ url_for('static', filename='js/form_phone.js') }}"></script>
 {% endblock %}
