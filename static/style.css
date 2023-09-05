@@ -32,3 +32,28 @@ h1 {
     width: 100%;
     z-index: 1000;
 }
+
+.modal-header {
+    color: #343a40;
+}
+
+.custom-modal-body {
+    color: black;
+}
+
+.sub-label {
+    text-align: left;
+    margin-left: 20px;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.arrival-form {
+    padding: 20px;
+}
