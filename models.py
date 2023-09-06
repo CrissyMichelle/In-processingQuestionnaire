@@ -143,3 +143,4 @@ class Likes(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
     message_id = db.Column(db.Integer, db.ForeignKey('messages.id', ondelete='cascade'))
+# in the future, as a stretch goal, add db.relationship for likes.message
