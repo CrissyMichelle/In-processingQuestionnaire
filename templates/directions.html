@@ -4,11 +4,25 @@
 {% block content %}
 
 
-
-<div id="map"></div>
-<h2><p>Complimentary Navigation Service</p></h2>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD1qM67LtjsTauU9GN2ATfHgNKIPuI8HY&callback=initMap"></script>
 <div class="form-container">
+<div id="map"></div>
+</div>
+<h2>
+    <p>Complimentary Navigation Service</p>
+</h2> 
+    <!-- Button to open send_email Modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mapModal">
+    Get Directions
+    </button>
+<div class="modal" id="mapModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Route Plan </h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body custom-modal-body">
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAD1qM67LtjsTauU9GN2ATfHgNKIPuI8HY&callback=initMap"></script>
     <form id="get-directions" method="POST">
         {{ form.hidden_tag() }}
         {% for field in form
@@ -21,17 +35,22 @@
                 {% endfor %}
             </p>
         {% endfor %}
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn btn-success">Submit</button>
     </form>
-    <hr><hr>
-    <h6>Navigation</h6>
-    <h6 id="route-panel" class="text-black bg-light"></h6>
-    <hr><hr>
+            </div>
+        </div>
+    </div>
 </div>
+<hr><hr>
+<h6>Navigation</h6>
+<h6 id="route-panel" class="text-black bg-light"></h6>
+<hr><hr>
+
 <script>
     const origin = "{{ start }}";  
     const destination = "{{ end }}";  
     const mode = "{{ mode }}";  
 </script>
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+
 {% endblock %}

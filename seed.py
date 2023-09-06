@@ -103,8 +103,13 @@ db.session.add(message1)
 db.session.commit()
 message2 = Messages(text="chess is the best", timestamp = datetime(2023, 8, 23, 16, 21), user_id = me.id)
 db.session.add(message2)
+message3 = Messages(text="you is the best", timestamp = datetime(2023, 7, 23, 16, 21), user_id = april.id)
+db.session.add(message3)
 db.session.commit()
 
 like1 = Likes(user_id = snuffle.id, message_id = message1.id)
+like2 = Likes(user_id = snuffle.id, message_id = message2.id)
+
 db.session.add(like1)
+db.session.add(like2)
 db.session.commit()
