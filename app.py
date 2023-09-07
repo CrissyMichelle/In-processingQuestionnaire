@@ -390,9 +390,13 @@ def show_user_deets(username):
     if "username" not in session or username != session['username']:
         # raise Unauthorized()
         return redirect("/register")
-    s = User.query.filter(User.username == username).one()
-    soldier = s.incoming
-    return render_template("users/deets.html", soldier=soldier)
+    
+    try:
+        s = User.query.filter(User.username == username).one()
+        soldier = s.incoming
+        return render_template("users/deets.html", soldier=soldier)
+    except:
+        return redirect("/questionnaire")
 
 @app.route("/users/gaining/<username>")
 def show_gaining_user(username):
@@ -400,9 +404,13 @@ def show_gaining_user(username):
     if "username" not in session or username != session['username']:
         # raise Unauthorized()
         return redirect("/register")
-    g = User.query.filter(User.username == username).one()
-    gaining_unit_user = g.gainers
-    return render_template("users/gainers.html", soldier=gaining_unit_user)
+    
+    try:
+        g = User.query.filter(User.username == username).one()
+        gaining_unit_user = g.gainers
+        return render_template("users/gainers.html", soldier=gaining_unit_user)
+    except:
+        return redirect("/gainers_form")
 
 @app.route("/users/cadre/<username>")
 def show_cadre_user(username):
@@ -410,12 +418,15 @@ def show_cadre_user(username):
     if "username" not in session or username != session['username']:
         # raise Unauthorized()
         return redirect("/register")
-    c = User.query.filter(User.username == username).one()
-    cadre_user = c.cadre
+    
+    try:
+        c = User.query.filter(User.username == username).one()
+        cadre_user = c.cadre
+        form = AuthGetEmail()
 
-    form = AuthGetEmail()
-
-    return render_template("users/cadre.html", soldier=cadre_user, form=form)
+        return render_template("users/cadre.html", soldier=cadre_user, form=form)
+    except:
+        return redirect("/cadre_form")
 
 @app.route("/users/profile")
 def show_profile_page():
@@ -474,6 +485,40 @@ def edit_profile(username):
     
     else:
         return render_template("users/edit.html", form=form, soldier=u)
+
+@app.route('/get_all_users')
+def list_users():
+    """Pass every user from db to front end"""
+    all_users = User.query.all()
+
+    all_incoming = NewSoldier.query.all()
+    incoming_names = [{"name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming]
+
+    all_gainers = GainingUser.query.all()
+    gainer_names = [{"name": gainer.rank_and_name, "id": gainer.gaining_user.id} for gainer in all_gainers]
+    
+    all_cadre = Cadre.query.all()
+    cadre_names = [{"name": cadre.rank_and_name, "id": cadre.cadre_user.id} for cadre in all_cadre]
+
+    return jsonify(incoming_names=incoming_names, gainer_names=gainer_names, cadre_names=cadre_names)
+
+    
+@app.route('/users/show/<int:user_id>')
+def show_user(user_id):
+    """Shows user profile and user's messages"""
+
+    user = User.query.get_or_404(user_id)
+
+    messages = (Messages.query.filter(Messages.user_id == user_id)
+                .order_by(Messages.timestamp.desc()).all())
+    # for message in messages:
+    #     message.num_likes = Likes.query.filter_by(message_id=message.id).count()
+
+    # likes = [like.message for like in user.likes]
+    # for like in likes:
+    #     like.num_likes = Likes.query.filter_by(message_id=like.id).count()
+    
+    return render_template('users/show.html', user=user, messages=messages)
 
 @app.route("/users/<username>/delete", methods=["GET", "POST"])
 def show_delete_page(username):
@@ -571,22 +616,7 @@ def show_messages():
     messages = Messages.query.all()
     return render_template('messages/show.html', messages=messages, user=app_user)
 
-@app.route('/users/show/<int:user_id>')
-def show_user(user_id):
-    """Shows user profile and user's messages"""
 
-    user = User.query.get_or_404(user_id)
-
-    messages = (Messages.query.filter(Messages.user_id == user_id)
-                .order_by(Messages.timestamp.desc()).all())
-    for message in messages:
-        message.num_likes = Likes.query.filter_by(message_id=message.id).count()
-
-    likes = [like.message for like in user.likes]
-    for like in likes:
-        like.num_likes = Likes.query.filter_by(message_id=like.id).count()
-    
-    return render_template('users/show.html', user=user, messages=messages, likes=likes)
 
 # @app.route('/messages/<int:message_id>/like', methods=["POST"])
 # def add_like(message_id):

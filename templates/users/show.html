@@ -1,28 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
+<img src="{{ user.image_url }}" alt="user profile pic">
 <h2>
-    <p>{{ user.rank }} {{ user.last_name }}</p>
+    <p>{{ user.rank_and_name }}</p>
     <p>{{ user.email }} {% if user.phone_number %}
         {{ user.phone_number }}
         {% endif %}
       </p>
-    {% if user.type == 'gainer' %}
-        <p>{{ user.BDE }} {{ user.BN }} {{ user.unit }}</p>
-        <p>{{ user.gainers.role }}</p>
+    {% if user.type == 'gainers' %}
+      {% if user.gainers.BN %}
+        <h3>{{ user.gainers.BN }}</h3>
+      {% endif %}
+      {% if user.gainers.unit %}
+        <h3>{{ user.gainers.unit }}</h3>
+      {% endif %}
+      <h3>{{ user.gainers.role }}</h3>
     {% elif user.type == 'cadre' %}
         <p>Replacement Company Cadre Member</p>
-        <p>{{ user.cadre.role }}</p>
+        <h3>{{ user.cadre.role }}</h3>
+    {% elif user.type == 'incoming' %}
+        <h3>{{ user.incoming.role }}</h3>
     {% endif %}
+    <p>Bio: {{ user.bio }}</p>
 </h2>
 <div class="col-sm-6">
     <ul class="list-group" id="messages">
       {% for message in messages %}
         <li class="list-group-item">
-          <a href="/users/{{ user.id }}">
-            <img src="{{ user.image_url }}" alt="user image" class="timeline-image">
           </a>
           <div class="message-area">
-            <a href="/users/{{ user.id }}">@{{ user.username }}</a>
+            <a href="/users/show/{{ user.id }}">@{{ user.username }}</a>
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
             <p style="color: black;"><b>{{ message.text }}</b></p>
           </div>
