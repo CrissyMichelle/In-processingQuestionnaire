@@ -70,6 +70,7 @@ class NewSoldier(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     arrival_datetime = db.Column(db.DateTime, nullable = False)
     report_bldg1020 = db.Column(db.Date)
+    role = db.Column(db.Text, default='incoming')
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
     # Initialed fields for accountability

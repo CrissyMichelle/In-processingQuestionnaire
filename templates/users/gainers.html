@@ -2,7 +2,13 @@
 {% extends 'base.html' %}
 {% block title %}User Details{% endblock %}
 {% block content %}
-<h2>{{ soldier.rank_and_name }}, Representing a Receiving Unit</h2>
+<h2>{{ soldier.rank_and_name }}, Gaining Unit</h2>
+{% if soldier.BN %}
+    <h3>{{ soldier.BN }}</h3>
+{% endif %}
+{% if soldier.unit %}
+    <h3>{{ soldier.unit }}</h3>
+{% endif %}
 <p><img src="{{ soldier.gaining_user.image_url }}"</p>
 <p>Rank: {{ soldier.gaining_user.rank }}</p>
 <p>First Name: {{ soldier.gaining_user.first_name }}</p>
