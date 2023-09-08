@@ -33,10 +33,10 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
-mail = Mail(app)
-
-connect_db(app)
-db.create_all()
+with app.app_context():
+    mail = Mail(app)
+    connect_db(app)
+    db.create_all()
 
 @app.route("/")
 def to_register():
