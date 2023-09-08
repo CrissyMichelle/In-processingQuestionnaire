@@ -18,6 +18,40 @@ h1 {
 
 .single-message {
     color: black;
+    padding: 5 px 0;
+}
+
+.message-heading {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.message-area {
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.list-group-item {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 20px;
+}
+
+.timeline-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.detail-profile-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
 }
 
 #demo-banner {
@@ -56,4 +90,96 @@ h1 {
 
 .arrival-form {
     padding: 20px;
+}
+
+.search-wrapper {
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: relative;
+    right: 0;
+}
+
+#search-bar-title {
+    margin: 0;
+    text-align: left;
+    align-self: flex-start;
+    padding-bottom: 5px;
+}
+
+.search-container {
+    display: inline-block;
+}
+
+.bottom {
+    background-color: #cbc5bf;
+}
+
+.flash-message {
+    background-color: #A9A57C;
+    color: #333;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #ffa07a;
+    border-radius: 7px;
+    font-weight: bold;
+    animation: flash-animation 2s ease-in-out;
+}
+
+@keyframes flash-animation {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }    
+}
+
+.server-side-warning {
+    color: red;
+    background-color: #f9f9f9;
+    border: 1px solid red;
+    border-radius: 5px;
+    padding: 10px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.button-style {
+    background-color: #343a40;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.button-style:hover {
+    background-color: #218838;
+}
+
+#delete-btn:hover {
+    background-color: #555;
+}
+
+.link-style {
+    color: #cdcdc6;
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+}
+
+.link-style:hover {
+    border-bottom: 2px solid #cdcdcd;
+    color: #cdcdc6;
+}
+
+.comment-link-wrapper {
+    display: inline-block;
+}
+
+#post-comment {
+    margin-left: 20px; 
+    align-self: flex-start;
 }

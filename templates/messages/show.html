@@ -3,8 +3,8 @@
 {% block content %}
 
   <div class="bg"></div>
-  <div class="row justify-content-center">
-    <div class="col-md-6">
+  <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+    <div class="col-md-6" style="max-width: 600px;">
       <ul class="list-group no-hover" id="messages">
         {% for message in messages %}
         <li class="list-group-item">
@@ -33,7 +33,8 @@
         {% endfor %}
       </ul>
     </div>
-    <a href="{{ url_for('messages_add') }}">Post a new comment</a>
-  </div>
-
+    <div class="comment-link-wrapper">
+      <a href="{{ url_for('messages_add') }}" class="link-style">Post a new comment</a>
+    </div>
+    </div>
 {% endblock %}

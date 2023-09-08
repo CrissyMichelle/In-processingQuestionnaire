@@ -4,7 +4,7 @@ from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from key import GOOGLE_MAPS_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD
+from key import GOOGLE_MAPS_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Likes
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
 import logging, datetime, traceback, sys, pdb, requests, os
@@ -62,7 +62,14 @@ def signup_form():
         email = form.email.data
         type = form.type.data
         
+        # Check if username already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash("Username already taken, please choose another.")
+            return render_template("register.html", form=form)
+        
         new_user = User.register(username=username, pwd=password, email=email, type=type)
+        db.session.add(new_user)
         db.session.commit()
         
         # put newly-created username into current browser session
@@ -122,7 +129,7 @@ def send_email():
 
     form = AuthGetEmail()
     entered_code = None
-    correct_code = "25IDfy24OK"
+    correct_code = GET_EMAIL
 
     if form.validate_on_submit():
         entered_code = form.code.data
@@ -433,14 +440,17 @@ def show_profile_page():
     """Redirect to user's profile details"""
     if "username" in session:
         username = session['username']
-        u = User.query.filter(User.username == username).one()
 
-        if u.type == "incoming":
-            return redirect(f"/users/{username}")
-        elif u.type == "gainers":
-            return redirect(f"/users/gaining/{username}")
-        else:
-            return redirect(f"/users/cadre/{username}")
+        try:
+            u = User.query.filter(User.username == username).one()
+            if u.type == "incoming":
+                return redirect(f"/users/{username}")
+            elif u.type == "gainers":
+                return redirect(f"/users/gaining/{username}")
+            else:
+                return redirect(f"/users/cadre/{username}")
+        except:
+            return redirect("/register")
         
     else:
         return redirect("/register")
