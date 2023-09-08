@@ -18,7 +18,8 @@
                     {% endif %}
                 <p>{{ field }}
                 {% for error in field.errors %}
-                    {{ error }}</p>
+                    <div class="server-side-warning">{{ error }}</div>
+                </p>
                 {% endfor %}
                 <br><br>
             </p>
@@ -36,7 +37,7 @@
             </p>
             {% endif %}
         {% endfor %}
-        <button type="submit">Submit</button>
+        <button type="submit" class="button-style">Submit</button>
     </form>
 </div>
 <script src="{{ url_for('static', filename='js/form_actions.js') }}"></script>

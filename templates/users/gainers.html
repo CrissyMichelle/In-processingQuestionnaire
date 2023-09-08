@@ -2,18 +2,18 @@
 {% extends 'base.html' %}
 {% block title %}User Details{% endblock %}
 {% block content %}
-<h2>{{ soldier.rank_and_name }}, Gaining Unit</h2>
+<h2>{{ soldier.rank_and_name }}, Gaining Unit Rep</h2>
 {% if soldier.BN %}
     <h3>{{ soldier.BN }}</h3>
 {% endif %}
 {% if soldier.unit %}
     <h3>{{ soldier.unit }}</h3>
 {% endif %}
-<p><img src="{{ soldier.gaining_user.image_url }}"</p>
+<h3>Role: {{ soldier.role }}</h3>
+<p><img src="{{ soldier.gaining_user.image_url }}" class="detail-profile-image"></p>
 <p>Rank: {{ soldier.gaining_user.rank }}</p>
 <p>First Name: {{ soldier.gaining_user.first_name }}</p>
 <p>Last Name: {{ soldier.gaining_user.last_name }}</p>
-<p>Role: {{ soldier.role }}</p>
 <p>email: {{ soldier.gaining_user.email }}</p>
 <p>phone: {{ soldier.gaining_user.phone_number }}</p>
 <p>Brigade: {{ soldier.BDE }}</p>
@@ -26,9 +26,17 @@
 
 <p>Username: {{ soldier.username }}</p>
 <div>
-    <p><a href="/users/edit/{{ soldier.username }}">Edit Profile</a></p>
-    <p><a href="/logout">Logout</a></p>
+    <p>
+        <button class="button-style" onclick="location.href='/users/edit/{{ soldier.username }}';">
+            Edit Profile
+        </button>
+    </p>
+    <p>
+        <button class="button-style" id="delete-btn" onclick="location.href='/logout';">
+            Logout
+        </button>
+    </p>
 </div>
 <br>
-<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}">Delete account?</a></p>
+<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}" class="link-style">Delete account?</a></p>
 {% endblock %}

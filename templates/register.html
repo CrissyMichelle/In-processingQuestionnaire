@@ -3,7 +3,7 @@
 {% block title %}Register New User{% endblock %}
 {% block content %}
 <h2>Create an Account</h2>
-<form id="create-user-form" method="POST">
+<form id="create-user-form" class="form-container" method="POST">
     {{ form.hidden_tag() }}
     {% for field in form
         if field.widget.input_type != 'hidden' %}
@@ -15,9 +15,12 @@
             {% endfor %}
         </p>
     {% endfor %}
-    <button type="submit">Submit</button>
+    <button type="submit" class="button-style">Submit</button>
 </form>
 <div>
-    <p>Already have an account? <a href="/login">Login</a></p>
+    <p>Already have an account?</p>
+    <a class="link-style" href="/login">
+        Login
+    </a> 
 </div>
 {% endblock %}

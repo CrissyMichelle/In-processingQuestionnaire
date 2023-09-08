@@ -31,8 +31,10 @@
                 <b>{{ field.label }}</b>
                 <p>{{ field(id=field.name) }}
                 {% for error in field.errors %}
-                {{ error }}</p>
+                    <div class="server-side-warning">{{ error }}</div>
                 {% endfor %}
+                </p>
+                
             </p>
         {% endfor %}
         <button type="submit" class="btn btn-success">Submit</button>

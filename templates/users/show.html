@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<img src="{{ user.image_url }}" alt="user profile pic">
+<img src="{{ user.image_url }}" alt="user profile pic" class="detail-profile-image">
 <h2>
     <p>{{ user.rank_and_name }}</p>
     <p>{{ user.email }} {% if user.phone_number %}

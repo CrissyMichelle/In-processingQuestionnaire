@@ -6,7 +6,6 @@ const searchAll = [];
 async function fetchUsers() {
     const response = await fetch('/get_all_users');
     const data = await response.json();
-    console.log("Data from server: ", data);
 
     const incoming = data.incoming_names;
     const gainers = data.gainer_names;
@@ -41,7 +40,6 @@ async function fetchUsers() {
 
     function showSuggestions(inputVal) {
         let drops = search(inputVal);
-        console.log("Suggestions to be displayed: ", drops);
 
         if (drops !== []) {
             suggestions.appendChild(newUl).innerHTML = drops.join('');
@@ -63,7 +61,6 @@ async function fetchUsers() {
     input.addEventListener('keyup', searchHandler);
     newUl.addEventListener('click', useSuggestion);
 
-    console.log("fetchUsers has run. SearchAll: ", searchAll )
 }
 
 fetchUsers();

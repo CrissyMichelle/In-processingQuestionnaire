@@ -14,22 +14,19 @@
             <p>
                 <b>{{ field.label }}</b>
                     {% if field.sub_label %}
-                    <p class="sub-label">{{ field.sub_label }}</p>
+                        <p class="sub-label">{{ field.sub_label }}</p>
                     {% endif %}
-                <p>{{ field }}
+                {{ field }}
                 {% for error in field.errors %}
-                    {{ error }}</p>
+                    <div class="server-side-warning">{{ error }}</div>
                 {% endfor %}
                 <br><br>
             </p>
         {% endfor %}
-        <button type="submit">Submit</button>
+        <button type="submit" class="button-style">Submit</button>
     </form>
 </div>
 <hr><hr><hr>
-<p>If you have any questions about in-processing, please contact the U.S. Army Hawaii Reception Company at 808-655-4634 during
-    the normal duty hours Monday to Friday, 0900-1500 hrs or after duty hours contact the U.S. Army Hawaii Reception Company
-    CQ desk at 808-655-0389.
-</p>
+
 <script src="{{ url_for('static', filename='js/form_phone.js') }}"></script>
 {% endblock %}

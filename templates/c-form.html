@@ -12,18 +12,18 @@
         {% for field in form
             if field.widget.input_type != 'hidden' %}
             <p>
-                <b>{{ field.label }}</b>
-                    {% if field.sub_label %}
+                <b>{{ field.label }}</b>    
+                {% if field.sub_label %}
                     <p class="sub-label">{{ field.sub_label }}</p>
-                    {% endif %}
-                <p>{{ field }}
+                {% endif %}
+                {{ field }}
                 {% for error in field.errors %}
-                    {{ error }}</p>
+                    <div class="server-side-warning">{{ error }}</div>
                 {% endfor %}
                 <br><br>
             </p>
         {% endfor %}
-        <button type="submit">Submit</button>
+        <button type="submit" class="button-style">Submit</button>
     </form>
 </div>
 <hr><hr><hr>

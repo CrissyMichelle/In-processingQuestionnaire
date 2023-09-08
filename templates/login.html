@@ -11,13 +11,14 @@
             {{ field.label }}
             {{ field }}
             {% for error in field.errors %}
-                {{ error }}
+                <div class="server-side-warning">{{ error }}</div>
             {% endfor %}
         </p>
     {% endfor %}
-    <button type="submit">Submit</button>
+    <button type="submit" class="button-style">Submit</button>
 </form>
+<br><br>
 <div>
-    <p>Don't have an account? <a href="/register">Create one!</a></p>
+    <p>Don't have an account? <button type="button" class="btn btn-primary" onclick="location.href='/register';">Create one!</button></p>
 </div>
 {% endblock %}

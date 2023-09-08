@@ -20,7 +20,7 @@
     <p>SCHOFIELD BARRACKS, HAWAII</p>
     <p>"RENEGADES"</p></h1>
     {% for msg in get_flashed_messages() %}
-        <p>{{ msg }}</p>
+        <p class="flash-message">{{ msg }}</p>
     {% endfor %}<hr>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
       <a class="navbar-brand" href="/">Soldier Profile</a>
@@ -36,18 +36,37 @@
           {% endif %}
         </li>
       </ul>
-      <p class="nav-item">Soldier LookUp</p>
-        <div class="search-container">
-          
-          <input type="text" placeholder="Search for rank or name" id="search-bar">
-          
+      <div class="nav-item search-wrapper">
+        <p id="search-bar-title">Soldier LookUp</p>
+        <div class="search-container">            
+          <input type="text" placeholder="Type in a rank or name" id="search-bar">            
           <div class="suggestions"></div>
         </div>
-      
+      </div>
     </nav>
     <hr><hr>
     {% block content %}
     {% endblock %}
+    <br>
+    <hr><hr>
+    <section class="bottom">
+      <footer class="text-center" style="color: black;">
+        <div class="container p-3 pb-0">
+          <p class="d-flex justify-content-center align-items-center">
+            <span class="me-3 pr-2">Submit your Innovation Idea</span>
+            <a href="https://25id.soldierinnovation.com/sMain/landing" target="_blank">
+              <button type="button" class="btn btn-outline-light">
+                <img width="80.13" height="71" src="{{ url_for('static', filename='images/LLabsLogo.png')}}" alt="Lightning Labs Logo" id="footer-image">
+              </button>  
+            </a>
+          </p>
+        </div>
+        <div class="text-center p-2" style="background-color: #cdcdc6">
+          <p>Custom application. Engineered by the 25ID Lightning Labs Software Dev Team</p>
+          <p>© 2023</p>
+        </div>
+      </footer>
+    </section>
   </div>
   <script src="{{ url_for('static', filename='js/search_bar.js') }}"></script>
 </body>
