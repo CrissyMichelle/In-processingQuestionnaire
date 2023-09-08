@@ -4,7 +4,7 @@ from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL
+# from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Likes
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
 import logging, datetime, traceback, sys, pdb, requests, os
