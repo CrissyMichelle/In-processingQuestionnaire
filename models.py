@@ -102,7 +102,7 @@ class NewSoldier(db.Model):
     
 
 class Cadre(db.Model):
-    """Models a cadre user working at Replacement Company"""
+    """Models a cadre user working at Reception Company"""
     __tablename__ = 'cadre'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

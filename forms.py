@@ -107,7 +107,7 @@ class CreateUserForm(FlaskForm):
     password = PasswordField("password", validators=[InputRequired(), Length(min=6)])
     email = StringField("email", validators=[InputRequired()])
     type = SelectField("user type", validators=[InputRequired()],
-                       choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Replacement CO Cadre")])
+                       choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Reception Co. Cadre")])
 
 class GainersForm(FlaskForm):
     """Form for adding new gaining-unit users"""

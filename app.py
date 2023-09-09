@@ -164,7 +164,7 @@ def send_email():
 
             cadre_member = cadre_user.email
 
-            msg = Message('Incoming REPLCo Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
             msg.body = "See attached for incoming personnel data"
             with app.open_resource(excel_path) as fp:
                 msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
@@ -198,7 +198,7 @@ def logout():
 
 @app.route("/questionnaire", methods=["GET", "POST"])
 def page_for_inproc_users():
-    """Show and handle Replacement Company's incoming personnel questionaire"""
+    """Show and handle Reception Company's incoming personnel questionaire"""
     # but first, make sure only logged in users can get here
     if "username" not in session:
         # raise Unauthorized()
@@ -339,7 +339,7 @@ def page_for_gaining_users():
 
 @app.route("/cadre_form", methods=["GET", "POST"])
 def page_for_cadre_users():
-    """Show and handle form for Replacement Company cadre users"""
+    """Show and handle form for Reception Company cadre users"""
     # but first, make sure only logged in users can get here
     if "username" not in session:
         # raise Unauthorized()
@@ -356,7 +356,7 @@ def page_for_cadre_users():
         f_name = form.f_name.data
         l_name = form.l_name.data
 
-        # Role in Replacement Company organization
+        # Role in Reception Company organization
         role = form.role.data
         # Telephonic recall
         telephone = form.telephone.data
