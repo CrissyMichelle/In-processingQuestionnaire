@@ -95,7 +95,7 @@ def login_form():
     
     form = LoginForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         username = form.username.data
         password = form.password.data
 
@@ -131,7 +131,7 @@ def send_email():
     entered_code = None
     correct_code = os.environ.get('GET_EMAIL')
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         entered_code = form.code.data
         
         if entered_code == correct_code:
@@ -206,7 +206,7 @@ def page_for_inproc_users():
 
     form = ArrivalForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         username = session['username']
         incoming_user = User.query.filter(User.username == username).one()
 
@@ -290,7 +290,7 @@ def page_for_gaining_users():
 
     form = GainersForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         username = session['username']
         gaining_user = User.query.filter(User.username == username).one()
 
@@ -347,7 +347,7 @@ def page_for_cadre_users():
 
     form = CadreForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         username = session['username']
         cadre_user = User.query.filter(User.username == username).one()
 
@@ -463,7 +463,7 @@ def edit_profile(username):
     u = User.query.filter(User.username == username).one()
 
     form = EditUserForm()
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         editing_user = User.authenticate(u.username, form.password.data)
         if editing_user:
             try:
@@ -554,7 +554,7 @@ def show_useful_links():
 
     form = EnterEndpointForm()
     if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        if form.validate_on_submit():
+        if form.is_submitted() and form.validate():
             end_point = form.destination.data
             return jsonify(success=True)
         else:
@@ -602,7 +602,7 @@ def messages_add():
 
     form = MessageForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted() and form.validate():
         if username:
             app_user = User.query.filter(User.username == username).one()
         msg = Messages(text=form.text.data, timestamp=datetime.utcnow())
