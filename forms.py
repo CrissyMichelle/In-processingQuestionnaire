@@ -116,7 +116,7 @@ class CreateUserForm(FlaskForm):
     #         return False
         
     #     return initial_validation and True
-    code = PasswordField("Enter verification code", validators=[DataRequired()])
+    code = PasswordField("Verification code", validators=[DataRequired()])
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])

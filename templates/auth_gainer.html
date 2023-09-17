@@ -12,7 +12,7 @@
   <title>Verify Gaining-Type of User</title>
 </head>
 <body>
-  <form id="auth-gainer-form" action="/auth_gainer" method="POST">
+  <form action="/auth_gainer" method="POST">
     {{ form.hidden_tag() }}
     {% for field in form
         if field.widget.input_type != 'hidden' %}
