@@ -205,7 +205,7 @@ class AuthGainerForm(FlaskForm):
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])
-    submit = SubmitField("Submit User Type Gaining")
+    # submit = SubmitField("Submit User Type Gaining")
 
 class AuthCadreForm(FlaskForm):
     """Form authorizing cadre type registration"""
