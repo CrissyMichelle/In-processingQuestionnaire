@@ -120,8 +120,8 @@ class CreateUserForm(FlaskForm):
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])
-    type = SelectField("user type", validators=[InputRequired()],
-                       choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Reception Co. Cadre")])
+    # type = SelectField("user type", validators=[InputRequired()],
+    #                    choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Reception Co. Cadre")])
 
 class GainersForm(FlaskForm):
     """Form for adding new gaining-unit users"""
@@ -197,3 +197,21 @@ class AuthGetEmail(FlaskForm):
 
     code = PasswordField("Enter access code", validators=[DataRequired()])
     submit = SubmitField("Email spreadsheet")
+
+class AuthGainerForm(FlaskForm):
+    """Form authorizing gainer type registration"""
+
+    code = PasswordField("Enter verification code", validators=[DataRequired()])
+    username = StringField("user name", validators=[InputRequired()])
+    password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
+    email = StringField("email", validators=[InputRequired()])
+    submit = SubmitField("Submit User Type Gaining")
+
+class AuthCadreForm(FlaskForm):
+    """Form authorizing cadre type registration"""
+
+    code = PasswordField("Enter verification code", validators=[DataRequired()])
+    username = StringField("user name", validators=[InputRequired()])
+    password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
+    email = StringField("email", validators=[InputRequired()])
+    submit = SubmitField("Submit User Type Cadre")

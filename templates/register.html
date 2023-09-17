@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% block title %}Register New User{% endblock %}
 {% block content %}
-<h2>Create an Account</h2>
+<h2>Create an <b>Incoming Soldier</b> Account</h2>
 <form id="create-user-form" class="form-container" method="POST">
     {{ form.hidden_tag() }}
     {% for field in form
@@ -17,6 +17,48 @@
     {% endfor %}
     <button type="submit" class="button-style">Submit</button>
 </form>
+<p>Not an incoming Soldier? Select your user type.
+    <!-- Button to open send_email Modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#gainModal">
+        Gaining
+        </button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cadreModal">
+        Cadre
+        </button>
+    </p>
+<!-- The email Modal -->
+<div class="modal" id="gainModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Verify <b>Gaining Unit</b> User Type</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                {% include 'auth_gainer.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="cadreModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Verify User Type</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                {% include 'auth_cadre.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div>
     <p>Already have an account?</p>
     <a class="link-style" href="/login">

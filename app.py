@@ -6,7 +6,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 # from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Likes
-from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail, AuthGainerForm
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -64,7 +64,7 @@ def signup_form():
         username = form.username.data
         password = form.password.data
         email = form.email.data
-        type = form.type.data
+        # type = form.type.data
         
         # Check if username already exists
         existing_user = User.query.filter_by(username=username).first()
@@ -72,22 +72,64 @@ def signup_form():
             flash("Username already taken, please choose another.")
             return render_template("register.html", form=form)
         
-        new_user = User.register(username=username, pwd=password, email=email, type=type)
+        new_user = User.register(username=username, pwd=password, email=email, type='incoming')
         db.session.add(new_user)
         db.session.commit()
         
         # put newly-created username into current browser session
         session['username'] = new_user.username
-        flash(f"Added User {username}")
+        flash(f"Added Incoming User {username}")
 
-        if type == 'incoming':
-            return redirect("/questionnaire")
-        elif type == 'gainers':
-            return redirect("/gainers_form")
-        elif type == 'cadre':
-            return redirect("/cadre_form")
+        # if type == 'incoming':
+        return redirect("/questionnaire")
+        # elif type == 'gainers':
+        #     return redirect("/gainers_form")
+        # elif type == 'cadre':
+        #     return redirect("/cadre_form")
     else:
         return render_template("register.html", form=form)
+    
+@app.route("/auth_gainer", methods=["GET", "POST"])
+def authorize_gainer_type():
+    """Shows modal for verifying gainer type"""
+
+    if "username" in session:
+        flash(f"You can create a new user. But {session['username']} must logout first!")
+        return redirect("/users/profile")
+    
+    form = AuthGainerForm()
+    entered_code = None
+    correct_code = '@RmyGo3sRollingAlong'
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            username = form.username.data
+            password = form.password.data
+            email = form.email.data
+
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash("Username already taken, please choose another.")
+                return render_template("auth_gainer.html", form=form)
+            
+            new_user = User.register(username=username, pwd=password, email=email, type='gainers')
+            db.session.add(new_user)
+            db.session.commit()
+            
+            # put newly-created username into current browser session
+            session['username'] = new_user.username
+            flash(f"Added Gaining Unit User {username}")
+
+            return redirect("/gainers_form")
+        
+        else:
+            flash("Bad passcode.")
+            return render_template("register.html", form=CreateUserForm)
+    else:
+        return render_template("register.html", form=CreateUserForm)
+        # return redirect("/cadre_form")
     
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
