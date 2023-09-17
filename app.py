@@ -126,9 +126,10 @@ def authorize_gainer_type():
         
         else:
             flash("Bad passcode.")
-            return render_template("register.html", form=CreateUserForm)
-    else:
-        return render_template("register.html", form=CreateUserForm)
+            return render_template("auth_gainer.html", form=form)
+        
+    return render_template("auth_gainer.html", form=form)
+
         # return redirect("/cadre_form")
     
 @app.route("/login", methods=["GET", "POST"])
