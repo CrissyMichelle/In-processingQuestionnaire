@@ -64,7 +64,6 @@ def signup_form():
         username = form.username.data
         password = form.password.data
         email = form.email.data
-        # type = form.type.data
         
         # Check if username already exists
         existing_user = User.query.filter_by(username=username).first()
@@ -80,12 +79,8 @@ def signup_form():
         session['username'] = new_user.username
         flash(f"Added Incoming User {username}")
 
-        # if type == 'incoming':
         return redirect("/questionnaire")
-        # elif type == 'gainers':
-        #     return redirect("/gainers_form")
-        # elif type == 'cadre':
-        #     return redirect("/cadre_form")
+
     else:
         return render_template("register.html", form=form)
     
