@@ -97,7 +97,7 @@ def authorize_gainer_type():
         flash(f"You can create a new user. But {session['username']} must logout first!")
         return redirect("/users/profile")
     
-    form = AuthGainerForm()
+    form = CreateUserForm()
     entered_code = None
     correct_code = '@RmyGo3sRollingAlong'
 

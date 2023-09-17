@@ -14,7 +14,6 @@
 <body>
   <form id="auth-gainer-form" action="/auth_gainer" method="POST">
     {{ form.hidden_tag() }}
-    {{ form.code.label }} {{ form.code() }}
     {% for field in form
         if field.widget.input_type != 'hidden' %}
         <p>

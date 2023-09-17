@@ -6,7 +6,7 @@
 <form id="create-user-form" class="form-container" method="POST">
     {{ form.hidden_tag() }}
     {% for field in form
-        if field.widget.input_type != 'hidden' %}
+        if field.widget.input_type != 'hidden' and field.widget.input_type != 'code' %}
         <p>
             {{ field.label }}
             {{ field }}
