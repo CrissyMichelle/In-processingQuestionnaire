@@ -3,6 +3,10 @@ from wtforms import DateField, TimeField, StringField, SelectField, PasswordFiel
 from wtforms.validators import InputRequired, Regexp, DataRequired, Length, Email
 from wtforms.widgets import Input
 
+# @overwrite:
+# def validate(self, extra_validators=None):
+#     initial_validation = super(FlaskForm, self).validate(extra_validators)
+
 class HTML5DateField(StringField):
     """Render wtf DateField into a string for html purposes"""
     widget = Input(input_type='date')
@@ -103,8 +107,18 @@ class ArrivalForm(FlaskForm):
     
 class CreateUserForm(FlaskForm):
     """Form for adding new users"""
+    # overide the behind-the-scenes validate() function call by explicitly setting the extra_validators arg to None.
+    # def validate(self):
+    #     initial_validation = super(CreateUserForm, self).validate(extra_validators=None)
+
+    #     if not self.username.data or not self.username.data.strip():
+    #         self.username.errors.append('This field is required.')
+    #         return False
+        
+    #     return initial_validation and True
+
     username = StringField("user name", validators=[InputRequired()])
-    password = PasswordField("password", validators=[InputRequired(), Length(min=6)])
+    password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])
     type = SelectField("user type", validators=[InputRequired()],
                        choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Reception Co. Cadre")])
