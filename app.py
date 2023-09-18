@@ -125,7 +125,48 @@ def authorize_gainer_type():
         
     return render_template("auth_gainer.html", form=form)
 
-        # return redirect("/cadre_form")
+@app.route("/auth_cadre", methods=["GET", "POST"])
+def authorize_cadre_type():
+    """Shows modal for verifying gainer type"""
+
+    if "username" in session:
+        flash(f"You can create a new user. But {session['username']} must logout first!")
+        return redirect("/users/profile")
+    
+    form = CreateUserForm()
+    entered_code = None
+    correct_code = 'R3cept!'
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            username = form.username.data
+            password = form.password.data
+            email = form.email.data
+
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash("Username already taken, please choose another.")
+                return render_template("auth_cadre.html", form=form)
+            
+            new_user = User.register(username=username, pwd=password, email=email, type='cadre')
+            db.session.add(new_user)
+            db.session.commit()
+            
+            # put newly-created username into current browser session
+            session['username'] = new_user.username
+            flash(f"Added Gaining Unit User {username}")
+
+            return redirect("/cadre_form")
+        
+        else:
+            flash("Bad passcode.")
+            return render_template("auth_cadre.html", form=form)
+        
+    return render_template("auth_cadre.html", form=form)
+
+        # 
     
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
