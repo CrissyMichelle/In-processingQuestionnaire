@@ -64,7 +64,6 @@ def signup_form():
         username = form.username.data
         password = form.password.data
         email = form.email.data
-        type = form.type.data
         
         # Check if username already exists
         existing_user = User.query.filter_by(username=username).first()
@@ -72,23 +71,101 @@ def signup_form():
             flash("Username already taken, please choose another.")
             return render_template("register.html", form=form)
         
-        new_user = User.register(username=username, pwd=password, email=email, type=type)
+        new_user = User.register(username=username, pwd=password, email=email, type='incoming')
         db.session.add(new_user)
         db.session.commit()
         
         # put newly-created username into current browser session
         session['username'] = new_user.username
-        flash(f"Added User {username}")
+        flash(f"Added Incoming User {username}")
 
-        if type == 'incoming':
-            return redirect("/questionnaire")
-        elif type == 'gainers':
-            return redirect("/gainers_form")
-        elif type == 'cadre':
-            return redirect("/cadre_form")
+        return redirect("/questionnaire")
+
     else:
         return render_template("register.html", form=form)
     
+@app.route("/auth_gainer", methods=["GET", "POST"])
+def authorize_gainer_type():
+    """Shows modal for verifying gainer type"""
+
+    if "username" in session:
+        flash(f"You can create a new user. But {session['username']} must logout first!")
+        return redirect("/users/profile")
+    
+    form = CreateUserForm()
+    entered_code = None
+    correct_code = '@RmyGo3sRollingAlong'
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            username = form.username.data
+            password = form.password.data
+            email = form.email.data
+
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash("Username already taken, please choose another.")
+                return redirect("/register", form=form)
+            
+            new_user = User.register(username=username, pwd=password, email=email, type='gainers')
+            db.session.add(new_user)
+            db.session.commit()
+            
+            # put newly-created username into current browser session
+            session['username'] = new_user.username
+            flash(f"Added Gaining Unit User {username}")
+
+            return redirect("/gainers_form")
+        
+        else:
+            flash("Bad passcode.")
+            return redirect("/register", form=form)
+        
+    return render_template("auth_gainer.html", form=form)
+
+@app.route("/auth_cadre", methods=["GET", "POST"])
+def authorize_cadre_type():
+    """Shows modal for verifying gainer type"""
+
+    if "username" in session:
+        flash(f"You can create a new user. But {session['username']} must logout first!")
+        return redirect("/users/profile")
+    
+    form = CreateUserForm()
+    entered_code = None
+    correct_code = 'R3cept!'
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            username = form.username.data
+            password = form.password.data
+            email = form.email.data
+
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                flash("Username already taken, please choose another.")
+                return redirect("/register", form=form)
+            
+            new_user = User.register(username=username, pwd=password, email=email, type='cadre')
+            db.session.add(new_user)
+            db.session.commit()
+            
+            # put newly-created username into current browser session
+            session['username'] = new_user.username
+            flash(f"Added Gaining Unit User {username}")
+
+            return redirect("/cadre_form")
+        
+        else:
+            flash("Bad passcode.")
+            return redirect("/register", form=form)
+        
+    return render_template("auth_cadre.html", form=form)
+
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
     """Shows form for logging in users and handles form submission"""

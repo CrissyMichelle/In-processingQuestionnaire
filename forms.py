@@ -116,13 +116,11 @@ class CreateUserForm(FlaskForm):
     #         return False
         
     #     return initial_validation and True
-
+    code = PasswordField("Verification code")
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])
-    type = SelectField("user type", validators=[InputRequired()],
-                       choices=[("incoming", "Incoming"), ("gainers", "Gaining Unit SM"), ("cadre", "Reception Co. Cadre")])
-
+    
 class GainersForm(FlaskForm):
     """Form for adding new gaining-unit users"""
     rank = SelectField("Rank:", validators=[InputRequired()],
