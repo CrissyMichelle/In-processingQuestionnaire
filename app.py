@@ -6,7 +6,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 # from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Likes
-from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail, AuthGainerForm
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -107,7 +107,7 @@ def authorize_gainer_type():
             existing_user = User.query.filter_by(username=username).first()
             if existing_user:
                 flash("Username already taken, please choose another.")
-                return render_template("auth_gainer.html", form=form)
+                return redirect("/register", form=form)
             
             new_user = User.register(username=username, pwd=password, email=email, type='gainers')
             db.session.add(new_user)
@@ -121,7 +121,7 @@ def authorize_gainer_type():
         
         else:
             flash("Bad passcode.")
-            return render_template("auth_gainer.html", form=form)
+            return redirect("/register", form=form)
         
     return render_template("auth_gainer.html", form=form)
 
@@ -148,7 +148,7 @@ def authorize_cadre_type():
             existing_user = User.query.filter_by(username=username).first()
             if existing_user:
                 flash("Username already taken, please choose another.")
-                return render_template("auth_cadre.html", form=form)
+                return redirect("/register", form=form)
             
             new_user = User.register(username=username, pwd=password, email=email, type='cadre')
             db.session.add(new_user)
@@ -162,12 +162,10 @@ def authorize_cadre_type():
         
         else:
             flash("Bad passcode.")
-            return render_template("auth_cadre.html", form=form)
+            return redirect("/register", form=form)
         
     return render_template("auth_cadre.html", form=form)
 
-        # 
-    
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
     """Shows form for logging in users and handles form submission"""
