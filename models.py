@@ -37,7 +37,6 @@ class User(db.Model):
     cadre = db.relationship('Cadre', backref=db.backref('cadre_user', uselist=False), foreign_keys=[cadre_id])
     gainers = db.relationship('GainingUser', backref=db.backref('gaining_user', uselist=False), foreign_keys=[gainUnit_userid])
     messages = db.relationship('Messages', backref='user')
-    likes = db.relationship('Likes', backref='user')
 
     @classmethod
     def register(cls, username, pwd, email, type):
@@ -73,6 +72,13 @@ class NewSoldier(db.Model):
     role = db.Column(db.Text, default='incoming')
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
+    # Late-add fields
+    DODID = db.Column(db.Integer)
+    gain_UIC = db.Column(db.Text)
+    lose_UIC = db.Column(db.Text)
+    home_town = db.Column(db.Text)
+    aar_comments = db.Column(db.Text)
+
     # Initialed fields for accountability
     tele_recall = db.Column(db.Text)
     in_proc_hours = db.Column(db.Text)
@@ -107,6 +113,7 @@ class Cadre(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     role = db.Column(db.Text)
+    alt_email = db.Column(db.String)
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
     @property
@@ -136,12 +143,3 @@ class Messages(db.Model):
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
-    
-class Likes(db.Model):
-    """Model for liking message posts"""
-    __tablename__ = 'likes'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='cascade'))
-    message_id = db.Column(db.Integer, db.ForeignKey('messages.id', ondelete='cascade'))
-# in the future, as a stretch goal, add db.relationship for likes.message
