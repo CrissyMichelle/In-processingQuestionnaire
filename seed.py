@@ -1,5 +1,5 @@
 """Seed file to make sample data for inprocessing database"""
-from models import User, NewSoldier, Cadre, GainingUser, Messages, Likes, db
+from models import User, NewSoldier, Cadre, GainingUser, Messages, db
 from sqlalchemy import text
 from app import app
 from datetime import datetime
@@ -24,25 +24,25 @@ NewSoldier.query.delete()
 Cadre.query.delete()
 GainingUser.query.delete()
 Messages.query.delete()
-Likes.query.delete()
 
 # Create base User objects
-snuffle = User(username='snuffle23', password ='passWORD!!123', email="joe.q.snuffy.mil@army.mil", type="incoming",
+snuffle = User(username='snuffle23', password ='passWORD!!123', email="joe.q.snuffy.not@4real.com", type="incoming",
                rank='PVT', first_name="Joe", last_name="Snuffy", phone_number='555-666-7474')
 
-wardawg = User(username='wardawg', password ='killKillKILL', email="claude.v.dayum.mil@army.mil", type="incoming",
+wardawg = User(username='wardawg', password ='killKillKILL', email="claude.v.dayum.not@4real.com", type="incoming",
                rank='SSG', first_name="Claude", last_name="Dayum")
 
-captain = User(username='cptO3', password ='cpt03', email="jack.b.reacher.mil@army.mil", type="cadre",
-               rank='CPT', first_name="Jack", last_name="Reacher", phone_number='808-555-6464')
-me = User(username='cmc', password ='123456', email="crissy.m.cabrera.mil@army.mil", type="cadre",
-               rank='SFC', first_name="Michelle", last_name="Cobra", phone_number='757-575-7479',
-               image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAL8dUDsl1jHCZ-BMdHXLm4FOexiZnf6KBSA&usqp=CAU')
+captain = User(username='cptO3', password ='cpt03', email="jack.b.reacher.not@4real.com", type="cadre",
+               rank='CPT', first_name="Jack", last_name="Reacher", phone_number='808-555-5555')
+me = User(username='cmc', password ='123456', email="xxxxxx.x.not@4real.com", type="cadre",
+               rank='SFC', first_name="Michelle", last_name="Cobra", phone_number='777-777-7777',
+               image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAL8dUDsl1jHCZ-BMdHXLm4FOexiZnf6KBSA&usqp=CAU',
+               bio='From a nice hometown, been in the Army 16 years, lifelong learner. I love using emerging tech to help out my fellow Soldiers!')
 
-april = User(username='aprilmay93', password ='sfc23', email="april.o.neal.mil@army.mil", type="gainers",
+april = User(username='aprilmay93', password ='sfc23', email="april.o.neal.not@4real.com", type="gainers",
                rank='SSG', first_name="April", last_name="ONeal", phone_number='610-999-0990')
-yody = User(username='yodyyolo', password ='654321', email="yannick.q.yaetz49.mil@army.mil", type="gainers",
-               rank='SGT', first_name="Yan", last_name="Yaetz", phone_number='610-999-0990')
+yody = User(username='yodyyolo', password ='654321', email="yannick.q.yaetz49.not@4real.com", type="gainers",
+               rank='SGT', first_name="Yan", last_name="Yaetz", phone_number='111-999-0990')
 
 # Add and commit the base User objects
 db.session.add(snuffle)
@@ -114,10 +114,3 @@ db.session.add(message3)
 message4 = Messages(text="YODY!!", timestamp = datetime(2023, 9, 7, 15, 21), user_id = yody.id)
 db.session.add(message4)
 db.session.commit()
-
-# like1 = Likes(user_id = snuffle.id, message_id = message1.id)
-# like2 = Likes(user_id = snuffle.id, message_id = message2.id)
-
-# db.session.add(like1)
-# db.session.add(like2)
-# db.session.commit()

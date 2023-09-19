@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID
-from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Likes
+from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
@@ -602,12 +602,6 @@ def show_user(user_id):
 
     messages = (Messages.query.filter(Messages.user_id == user_id)
                 .order_by(Messages.timestamp.desc()).all())
-    # for message in messages:
-    #     message.num_likes = Likes.query.filter_by(message_id=message.id).count()
-
-    # likes = [like.message for like in user.likes]
-    # for like in likes:
-    #     like.num_likes = Likes.query.filter_by(message_id=like.id).count()
     
     return render_template('users/show.html', user=user, messages=messages)
 
@@ -706,39 +700,3 @@ def show_messages():
 
     messages = Messages.query.all()
     return render_template('messages/show.html', messages=messages, user=app_user)
-
-
-
-# @app.route('/messages/<int:message_id>/like', methods=["POST"])
-# def add_like(message_id):
-#     """Adds a message to a user's likes"""
-
-#     if "username" not in session:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/")
-    
-#     username = session['username']
-#     app_user = User.query.filter(User.username == username).first()
-        
-    
-#     liked_message = Messages.query.get_or_404(message_id)
-#     # a user cannot like their own messages
-#     if liked_message.user_id == app_user.id:
-#         return abort(403)
-    
-#     existing_like = Likes.query.filter(
-#         Likes.message_id == liked_message.id,
-#         Likes.user_id == app_user.id
-#     ).first()
-
-#     if existing_like is None:
-#         new_like = Likes(user_id=app_user.id, message_id=liked_message.id)
-#         db.session.add(new_like)
-#         db.session.commit()
-#         return jsonify({'status': 'success', 'message': "Message liked!", 'action': 'increment'}), 200
-#     else:
-#         db.session.delete(existing_like)
-#         db.session.commit()
-#         return jsonify({'status': 'failure', 'message': "Message unliked.", 'action': 'decrement'}), 200
-
-    
