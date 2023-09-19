@@ -73,6 +73,13 @@ class NewSoldier(db.Model):
     role = db.Column(db.Text, default='incoming')
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
+    # Late-add fields
+    DODID = db.Column(db.Integer)
+    gain_UIC = db.Column(db.Text)
+    lose_UIC = db.Column(db.Text)
+    home_town = db.Column(db.Text)
+    aar_comments = db.Column(db.Text)
+
     # Initialed fields for accountability
     tele_recall = db.Column(db.Text)
     in_proc_hours = db.Column(db.Text)
