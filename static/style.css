@@ -183,3 +183,43 @@ h1 {
     margin-left: 20px; 
     align-self: flex-start;
 }
+
+.sidebar-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    position: relative;
+}
+
+.sidebar {
+    background-color: #f9f9f9;
+    width: 300px;
+    height: auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgb(0, 0, 0, 0.2);
+    font-family: 'Arial', sans-serif;
+    margin-left: auto;
+    transition: top 0.3s ease-out, position 0.3s ease-out;
+}
+
+.sidebar p {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #007bff
+}
+
+.sidebar a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.sidebar img {
+    width: 150px;
+    height: 150px;
+    border-radius: 5px;
+}
