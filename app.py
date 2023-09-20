@@ -12,15 +12,17 @@ from datetime import datetime
 import pandas as pd
 from openpyxl import Workbook
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
+
 
 
 app = Flask(__name__)
+app.logger.setLevel(logging.DEBUG)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
 app.config["SECRET_KEY"] = SECRET_KEY
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -281,16 +283,28 @@ def logout():
 def page_for_inproc_users():
     """Show and handle Reception Company's incoming personnel questionaire"""
     # but first, make sure only logged in users can get here
+    print("Session data at the beginning:", session)
     if "username" not in session:
+        print("redirecting to /register as username is not in session")
         # raise Unauthorized()
         return redirect("/register")
 
+    print("ENTERINGGGGG /QUESTIONNNNNNNNNNNNNNAIRE ROUTEooôôo1ôô")
+
     form = ArrivalForm()
 
-    if form.is_submitted() and form.validate():
-        username = session['username']
-        incoming_user = User.query.filter(User.username == username).one()
-
+    if form.is_submitted():
+        if form.validate():
+            print("Form validated")
+            try:
+                username = session['username']
+                print(f"NNNNNNNNNNNNNNNNNNNNnnnQuerying for username {username}")
+                incoming_user = User.query.filter(User.username == username).one()
+                print(f"Retrieved user: {incoming_user}GGGGGGgGGGGGGGGGGGG")
+            except Exception as e:
+                print(f"database query failed: {e}")
+        else:
+            print(f"Form errors: {form.errors}")
         # Airport arrival date
         datetime = form.datetime.data
         # Rank and name
@@ -349,6 +363,7 @@ def page_for_inproc_users():
                                 gtc             = gtc,
                                 tla             = tla,
                                 hotels          = hotels)
+        print(f"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNew arrived data: {new_arrived.__dict__}")
         db.session.add(new_arrived)
         try:
             db.session.commit()
@@ -360,6 +375,7 @@ def page_for_inproc_users():
             incoming_user.phone_number = telephone
 
             db.session.commit()
+            print("Added aNNNNNNNNNNNNNd linked new_arrived with incoming_userGGGGGGGGGGGGGGGGGGGGGGGGGGG")
         except IntegrityError:
             print("integrity Error: Possible duplicate entry or null value.")
             db.session.rollback()
@@ -491,15 +507,21 @@ def page_for_cadre_users():
 @app.route("/users/<username>")
 def show_user_deets(username):
     """Info page for logged-in-users"""
+    app.logger.debug("Entering /users/<username> route")
     if "username" not in session or username != session['username']:
         # raise Unauthorized()
         return redirect("/register")
     
     try:
+        app.logger.debug(f"Querying for username {username}")
         s = User.query.filter(User.username == username).one()
+        app.logger.debug(f"Retrieved user: {s}")
+
         soldier = s.incoming
+        app.logger.debug(f"Retrieved soldier details: {soldier}")
         return render_template("users/deets.html", soldier=soldier)
-    except:
+    except Exception as e:
+        app.logger.error(f"An error occurred: {e}")
         return redirect("/questionnaire")
 
 @app.route("/users/gaining/<username>")

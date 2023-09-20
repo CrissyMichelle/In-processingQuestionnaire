@@ -7,7 +7,7 @@
 </h3>    
     <i><p>Please fill out and submit.</p></i>
 <div class="form-container">
-    <form id="arrival-form" class="arrival-form" method="POST">
+    <form id="arrival-form" class="arrival-form" action="/questionnaire" method="POST">
         {{ form.hidden_tag() }}
         {% for field in form
             if field.widget.input_type != 'hidden' %}
