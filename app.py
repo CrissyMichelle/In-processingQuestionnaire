@@ -12,12 +12,9 @@ from datetime import datetime
 import pandas as pd
 from openpyxl import Workbook
 
-# logging.basicConfig(level=logging.INFO)
-
-
-
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
+# logging.basicConfig(level=logging.INFO)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
@@ -44,11 +41,12 @@ with app.app_context():
     connect_db(app)
     db.create_all()
 
+################################# User create/login Routes ################################
 @app.route("/")
 def to_register():
     """Redirects to page with registration form"""
     if "username" in session:
-        return redirect("/users/profile")
+        return redirect("/logout")
     else:
         return redirect("/register")
 
@@ -58,7 +56,7 @@ def signup_form():
     # but first, logged in users can't create a new user
     if "username" in session:
         flash(f"You can create a new user. But {session['username']} must logout first!")
-        return redirect("/users/profile")
+        return redirect("/logout")
     
     form = CreateUserForm()
 
@@ -67,12 +65,13 @@ def signup_form():
         password = form.password.data
         email = form.email.data
         
-        # Check if username already exists
+        # check if username already exists
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash("Username already taken, please choose another.")
             return render_template("register.html", form=form)
         
+        # new users defined as 'incoming' by default
         new_user = User.register(username=username, pwd=password, email=email, type='incoming')
         db.session.add(new_user)
         db.session.commit()
@@ -88,11 +87,11 @@ def signup_form():
     
 @app.route("/auth_gainer", methods=["GET", "POST"])
 def authorize_gainer_type():
-    """Shows modal for verifying gainer type"""
+    """Shows modal for verifying gainer user type"""
 
     if "username" in session:
         flash(f"You can create a new user. But {session['username']} must logout first!")
-        return redirect("/users/profile")
+        return redirect("/logout")
     
     form = CreateUserForm()
     entered_code = None
@@ -114,8 +113,7 @@ def authorize_gainer_type():
             new_user = User.register(username=username, pwd=password, email=email, type='gainers')
             db.session.add(new_user)
             db.session.commit()
-            
-            # put newly-created username into current browser session
+           
             session['username'] = new_user.username
             flash(f"Added Gaining Unit User {username}")
 
@@ -129,11 +127,11 @@ def authorize_gainer_type():
 
 @app.route("/auth_cadre", methods=["GET", "POST"])
 def authorize_cadre_type():
-    """Shows modal for verifying gainer type"""
+    """Shows modal for verifying cadre user type"""
 
     if "username" in session:
         flash(f"You can create a new user. But {session['username']} must logout first!")
-        return redirect("/users/profile")
+        return redirect("/logout")
     
     form = CreateUserForm()
     entered_code = None
@@ -156,7 +154,6 @@ def authorize_cadre_type():
             db.session.add(new_user)
             db.session.commit()
             
-            # put newly-created username into current browser session
             session['username'] = new_user.username
             flash(f"Added Cadre User {username}")
 
@@ -171,10 +168,10 @@ def authorize_cadre_type():
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
     """Shows form for logging in users and handles form submission"""
-    # but first, logged in users can't double tap login
+
     if "username" in session:
         flash(f"{session['username']} is already logged in!")
-        return redirect(f"/users/{session['username']}")
+        return redirect("/resources")
     
     form = LoginForm()
 
@@ -199,71 +196,6 @@ def login_form():
         
     return render_template("login.html", form=form)
 
-@app.route("/send_email", methods=["GET", "POST"])
-def send_email():
-    """Send email to logged in cadre member"""
-
-    if "username" not in session:
-        # raise Unauthorized()
-        return redirect("/register")
-    
-    username = session['username']
-    cadre_user = User.query.filter(User.username == username).one()
-
-    form = AuthGetEmail()
-    entered_code = None
-    correct_code = GET_EMAIL
-
-    if form.is_submitted() and form.validate():
-        entered_code = form.code.data
-        
-        if entered_code == correct_code:
-            # Retrieve data from incoming users in the User class
-            user_data = User.query.filter(and_(User.type == 'incoming', User.incoming.has(NewSoldier.arrival_datetime != None))).all()
-            # Convert user data into a pandas data frame
-            user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
-                                    user.phone_number, user.incoming.arrival_datetime,
-                                    user.incoming.tele_recall,
-                                    user.incoming.in_proc_hours,
-                                    user.incoming.new_pt,
-                                    user.incoming.uniform,
-                                    user.incoming.transpo,
-                                    user.incoming.orders,
-                                    user.incoming.da31,
-                                    user.incoming.pov,
-                                    user.incoming.flight,
-                                    user.incoming.mypay,
-                                    user.incoming.tdy,
-                                    user.incoming.gtc,
-                                    user.incoming.tla,
-                                    user.incoming.hotels) for user in user_data],
-                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival Date',
-                                            'Tele_recall', 'In_proc_Hours', 'Newcomer_PT', 'Duty_Uniform', 'Transpo',
-                                            'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
-                                            'TLA', 'Hotels'])
-            # Create excel file
-            excel_path = 'user_data.xlsx'
-            user_df.to_excel(excel_path, index=False)
-
-            cadre_member = cadre_user.email
-
-            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
-            msg.body = "See attached for incoming personnel data"
-            with app.open_resource(excel_path) as fp:
-                msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
-            mail.send(msg)
-
-            # Clean up by removing the excel file after sending
-            os.remove(excel_path)
-
-            flash('Email sent!')
-            return redirect(f"users/cadre/{session['username']}")
-        else:
-            flash("Bad access code.")
-            return redirect(f"users/cadre/{session['username']}")
-    
-    return render_template("send_email.html", form=form)
-
 @app.route("/logout")
 def logout():
     """Clears the browser session of username and redirects after grabbing logout time"""
@@ -279,32 +211,21 @@ def logout():
     except KeyError:
         return redirect("/register")
 
+################################ Form Routes for Inherited User Types ################################    
 @app.route("/questionnaire", methods=["GET", "POST"])
 def page_for_inproc_users():
     """Show and handle Reception Company's incoming personnel questionaire"""
-    # but first, make sure only logged in users can get here
-    print("Session data at the beginning:", session)
-    if "username" not in session:
-        print("redirecting to /register as username is not in session")
-        # raise Unauthorized()
-        return redirect("/register")
 
-    print("ENTERINGGGGG /QUESTIONNNNNNNNNNNNNNAIRE ROUTEooôôo1ôô")
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
 
     form = ArrivalForm()
 
-    if form.is_submitted():
-        if form.validate():
-            print("Form validated")
-            try:
-                username = session['username']
-                print(f"NNNNNNNNNNNNNNNNNNNNnnnQuerying for username {username}")
-                incoming_user = User.query.filter(User.username == username).one()
-                print(f"Retrieved user: {incoming_user}GGGGGGgGGGGGGGGGGGG")
-            except Exception as e:
-                print(f"database query failed: {e}")
-        else:
-            print(f"Form errors: {form.errors}")
+    if form.is_submitted() and form.validate():
+        username = session['username']
+        incoming_user = User.query.filter(User.username == username).one()
+
         # Airport arrival date
         datetime = form.datetime.data
         # Rank and name
@@ -363,7 +284,7 @@ def page_for_inproc_users():
                                 gtc             = gtc,
                                 tla             = tla,
                                 hotels          = hotels)
-        print(f"NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNew arrived data: {new_arrived.__dict__}")
+
         db.session.add(new_arrived)
         try:
             db.session.commit()
@@ -375,30 +296,30 @@ def page_for_inproc_users():
             incoming_user.phone_number = telephone
 
             db.session.commit()
-            print("Added aNNNNNNNNNNNNNd linked new_arrived with incoming_userGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+
         except IntegrityError:
-            print("integrity Error: Possible duplicate entry or null value.")
+            flash("Integrity Error: Possible duplicate entry or null value.", "danger")
             db.session.rollback()
+            return redirect("/logout")
         except SQLAlchemyError as e:
-            print(f"GeneralSQLAlchemy Error: {e}")
+            flash(f"Database Error: {e}", "danger")
             db.session.rollback()
+            return redirect("/logout")
         except Exception as e:
-            print(f"Error while committing session: {e}")
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+            flash(f"Error while committing session: {e}", "danger")
             db.session.rollback()
+            return redirect("/logout")
 
         return redirect(f"/users/{session['username']}")
-    
-    print(form.errors)
+
     return render_template("questionnaire.html", form=form)
 
 @app.route("/gainers_form", methods=["GET", "POST"])
 def page_for_gaining_users():
-    """Show and handle form for users receiving personnel"""
-    # but first, make sure only logged in users can get here
+    """Show and handle form for user type receiving personnel, 'gainers'."""
+
     if "username" not in session:
-        # raise Unauthorized()
+        flash("Please login or create a new user account.")
         return redirect("/register")
 
     form = GainersForm()
@@ -434,28 +355,28 @@ def page_for_gaining_users():
 
             db.session.commit()
         except IntegrityError:
-            print("integrity Error: Possible duplicate entry or null value.")
+            flash("Integrity Error: Possible duplicate entry or null value.", "danger")
             db.session.rollback()
+            redirect("/logout")
         except SQLAlchemyError as e:
-            print(f"GeneralSQLAlchemy Error: {e}")
+            flash(f"Database Error: {e}", "danger")
             db.session.rollback()
+            redirect("/logout")
         except Exception as e:
-            print(f"Error while committing session: {e}")
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+            flash(f"Error while committing session: {e}", "danger")
             db.session.rollback()
+            redirect("/logout")
 
         return redirect(f"users/gaining/{session['username']}")
-    
-    print(form.errors)
+
     return render_template("g-form.html", form=form)
 
 @app.route("/cadre_form", methods=["GET", "POST"])
 def page_for_cadre_users():
-    """Show and handle form for Reception Company cadre users"""
-    # but first, make sure only logged in users can get here
+    """Show and handle form for cadre user type"""
+
     if "username" not in session:
-        # raise Unauthorized()
+        flash("Please login or create a new user account.")
         return redirect("/register")
 
     form = CadreForm()
@@ -488,61 +409,132 @@ def page_for_cadre_users():
 
             db.session.commit()
         except IntegrityError:
-            print("integrity Error: Possible duplicate entry or null value.")
+            flash("Integrity Error: Possible duplicate entry or null value.", "danger")
             db.session.rollback()
+            redirect("/logout")
         except SQLAlchemyError as e:
-            print(f"GeneralSQLAlchemy Error: {e}")
+            print(f"Database Error: {e}", "danger")
             db.session.rollback()
+            redirect("/logout")
         except Exception as e:
-            print(f"Error while committing session: {e}")
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+            flash(f"Error while committing session: {e}", "danger")
             db.session.rollback()
+            redirect("/logout")
 
         return redirect(f"users/cadre/{session['username']}")
-    
-    print(form.errors)
+
     return render_template("c-form.html", form=form)
 
+@app.route("/send_email", methods=["GET", "POST"])
+def send_email():
+    """Send email to logged in cadre member"""
+
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
+    
+    username = session['username']
+    cadre_user = User.query.filter(User.username == username).one()
+
+    form = AuthGetEmail()
+    entered_code = None
+    correct_code = GET_EMAIL
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            # Retrieve data from incoming users in the User class
+            user_data = User.query.filter(and_(User.type == 'incoming', User.incoming.has(NewSoldier.arrival_datetime != None))).all()
+            # Convert user data into a pandas data frame
+            user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
+                                    user.phone_number, user.incoming.arrival_datetime, user.incoming.report_bldg1020,
+                                    user.incoming.tele_recall,
+                                    user.incoming.DODID, 
+                                    user.incoming.lose_UIC,
+                                    user.incoming.gain_UIC,  
+                                    user.incoming.home_town, 
+                                    user.incoming.known_sponsor, 
+                                    user.incoming.in_proc_hours,
+                                    user.incoming.new_pt,
+                                    user.incoming.uniform,
+                                    user.incoming.transpo,
+                                    user.incoming.orders,
+                                    user.incoming.da31,
+                                    user.incoming.pov,
+                                    user.incoming.flight,
+                                    user.incoming.mypay,
+                                    user.incoming.tdy,
+                                    user.incoming.gtc,
+                                    user.incoming.tla,
+                                    user.incoming.hotels) for user in user_data],
+                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
+                                            'Tele_recall', 'DODID', 'Losing_UIC', 'Gaining_UIC', 'Hometown', 'Known_Sponsor',
+                                            'In_proc_Hours', 'Newcomer_PT', 'Duty_Uniform', 'Transpo',
+                                            'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
+                                            'TLA', 'Hotels'])
+            # Create excel file
+            excel_path = 'user_data.xlsx'
+            user_df.to_excel(excel_path, index=False)
+
+            cadre_member = cadre_user.email
+
+            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+            msg.body = "See attached for incoming personnel data"
+            with app.open_resource(excel_path) as fp:
+                msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+            mail.send(msg)
+
+            # Clean up by removing the excel file after sending
+            os.remove(excel_path)
+
+            flash('Email sent!')
+            return redirect(f"users/cadre/{session['username']}")
+        else:
+            flash("Bad access code.", "danger")
+            return redirect(f"users/cadre/{session['username']}")
+    
+    return render_template("send_email.html", form=form)
+
+################################ User Profile Routes ################################
 @app.route("/users/<username>")
 def show_user_deets(username):
     """Info page for logged-in-users"""
-    app.logger.debug("Entering /users/<username> route")
+
     if "username" not in session or username != session['username']:
-        # raise Unauthorized()
+        flash("Please login or create a new user account.")
         return redirect("/register")
     
     try:
-        app.logger.debug(f"Querying for username {username}")
         s = User.query.filter(User.username == username).one()
-        app.logger.debug(f"Retrieved user: {s}")
-
         soldier = s.incoming
-        app.logger.debug(f"Retrieved soldier details: {soldier}")
         return render_template("users/deets.html", soldier=soldier)
     except Exception as e:
-        app.logger.error(f"An error occurred: {e}")
+        flash(f"An error occurred: {e}")
         return redirect("/questionnaire")
 
 @app.route("/users/gaining/<username>")
 def show_gaining_user(username):
     """Info page for logged-in g-users"""
+
     if "username" not in session or username != session['username']:
-        # raise Unauthorized()
+        flash("Please login or create a new user account.")
         return redirect("/register")
     
     try:
         g = User.query.filter(User.username == username).one()
         gaining_unit_user = g.gainers
         return render_template("users/gainers.html", soldier=gaining_unit_user)
-    except:
+    except Exception as e:
+        flash(f"An error occurred: {e}")
         return redirect("/gainers_form")
 
 @app.route("/users/cadre/<username>")
 def show_cadre_user(username):
     """Info page for logged-in cadre members"""
+
     if "username" not in session or username != session['username']:
-        # raise Unauthorized()
+        flash("Please login or create a new user account.")
         return redirect("/register")
     
     try:
@@ -551,12 +543,14 @@ def show_cadre_user(username):
         form = AuthGetEmail()
 
         return render_template("users/cadre.html", soldier=cadre_user, form=form)
-    except:
+    except Exception as e:
+        flash(f"An error occurred: {e}")
         return redirect("/cadre_form")
 
 @app.route("/users/profile")
 def show_profile_page():
     """Redirect to user's profile details"""
+
     if "username" in session:
         username = session['username']
 
@@ -572,12 +566,15 @@ def show_profile_page():
             return redirect("/register")
         
     else:
+        flash("Please login or create a new user account.")
         return redirect("/register")
 
 @app.route("/users/edit/<username>", methods=["GET", "POST"])
 def edit_profile(username):
     """Update profile for current user"""
+
     if "username" not in session or username != session['username']:
+        flash("Please login or create a new user account.")
         return redirect("/register")
     u = User.query.filter(User.username == username).one()
 
@@ -618,7 +615,6 @@ def edit_profile(username):
 @app.route('/get_all_users')
 def list_users():
     """Pass every user from db to front end"""
-    all_users = User.query.all()
 
     all_incoming = NewSoldier.query.all()
     incoming_names = [{"name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming]
@@ -646,6 +642,7 @@ def show_user(user_id):
 @app.route("/users/<username>/delete", methods=["GET", "POST"])
 def show_delete_page(username):
     """Show page for deletion based on logged in username in session"""
+
     if "username" not in session or username != session['username']:
          raise Unauthorized()
 
@@ -661,6 +658,44 @@ def show_delete_page(username):
 
     return render_template("/users/delete.html", soldier=soldier)
 
+################################# Extras ################################
+@app.route('/messages/new', methods=["GET", "POST"])
+def messages_add():
+    """Add a message:
+    Show form if GET. If valid, update message and redirect to show messages page.
+    """
+
+    if "username" not in session:
+        flash("You must be logged in to see messages!", "danger")
+        return redirect("/")
+    username = session['username']
+
+    form = MessageForm()
+
+    if form.is_submitted() and form.validate():
+        if username:
+            app_user = User.query.filter(User.username == username).one()
+        msg = Messages(text=form.text.data, timestamp=datetime.utcnow())
+        app_user.messages.append(msg)
+        db.session.commit()
+
+        return redirect("/messages/show")
+
+    return render_template('messages/new.html', form=form)
+
+@app.route('/messages/show')
+def show_messages():
+    """Render page showing all messages"""
+
+    if "username" not in session:
+        flash("You must be logged in to see messages!", "danger")
+        return redirect("/")
+    username = session['username']
+    app_user = User.query.filter(User.username == username).one()
+
+    messages = Messages.query.all()
+    return render_template('messages/show.html', messages=messages, user=app_user)
+
 @app.route("/resources", methods=["GET", "POST"])
 def show_useful_links():
     """Show page with links and API functionality"""
@@ -674,7 +709,6 @@ def show_useful_links():
             return jsonify(success=False, error="Form not validated")
     
     return render_template("links.html", form=form)
-
 
 @app.route("/api/directions")
 def get_directions_for_api_call():
@@ -701,40 +735,3 @@ def show_get_directions():
 
     form = GetDirectionsForm()
     return render_template("directions.html", origin=start, destination=end, mode=mode, form=form)
-
-@app.route('/messages/new', methods=["GET", "POST"])
-def messages_add():
-    """Add a message:
-    Show form if GET. If valid, update message and redirect to show messages page.
-    """
-
-    if "username" not in session:
-        flash("You must be logged in to see messages!", "danger")
-        return redirect("/")
-    username = session['username']
-
-    form = MessageForm()
-
-    if form.is_submitted() and form.validate():
-        if username:
-            app_user = User.query.filter(User.username == username).one()
-        msg = Messages(text=form.text.data, timestamp=datetime.utcnow())
-        app_user.messages.append(msg)
-        db.session.commit()
-
-        return redirect(f"/messages/show")
-
-    return render_template('messages/new.html', form=form)
-
-@app.route('/messages/show')
-def show_messages():
-    """Render page showing all messages"""
-
-    if "username" not in session:
-        flash("You must be logged in to see messages!", "danger")
-        return redirect("/")
-    username = session['username']
-    app_user = User.query.filter(User.username == username).one()
-
-    messages = Messages.query.all()
-    return render_template('messages/show.html', messages=messages, user=app_user)
