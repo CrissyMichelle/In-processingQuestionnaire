@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import DateField, TimeField, StringField, SelectField, PasswordField, BooleanField, ValidationError, TextAreaField, SubmitField
+from wtforms import DateField, TimeField, StringField, SelectField, PasswordField, BooleanField, ValidationError, TextAreaField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Regexp, DataRequired, Length, Email
 from wtforms.widgets import Input
 
@@ -29,8 +29,14 @@ class ValidGeoLocation:
     def __call__(self, form, field):
         pass
 
+
 class ArrivalForm(FlaskForm):
     """Form for tracking incoming personnel."""
+
+    # custom validator for dodid field
+    def validate_dodid_length(form, field):
+        if len(str(field.data)) != 10:
+            raise ValidationError('Please enter your DODID as numbers only.')
     # Arrival date and time
     datetime = HTML5DateTimeField('1.Arrival Date and Time:', validators=[DataRequired()])
     
@@ -51,7 +57,14 @@ class ArrivalForm(FlaskForm):
 
     # Telephonic recall
     telephone = StringField('2.Contact Phone Number (XXX-XXX-XXXX):',
-                            validators=[DataRequired(), Regexp(r'^\d{3}-\d{3}-\d{4}$',message="Please enter a valid telephone number in the format XXX-XXX-XXXX.")])
+                            validators=[DataRequired(), Regexp(r'^\d{3}-\d{3}-\d{4}$', message="Please enter a valid telephone number in the format XXX-XXX-XXXX.")])
+
+    # Late addition fields
+    dodid = IntegerField("DODID:", validators=[DataRequired(), validate_dodid_length])
+    lose_UIC = StringField("Losing Unit UIC:", validators=[DataRequired(), Length(min=6, message='UIC must be at least 6 characters long.')])
+    gain_UIC = StringField("Gaining Unit UIC:", validators=[DataRequired(), Length(min=6, message='UIC must be at least 6 characters long.')])
+    home_town = StringField("Home of Record:", validators=[DataRequired()])
+    known_sponsor = SelectField("You know your sponsor...True or False?", validators=[DataRequired()], choices=[('TRUE', 'TRUE'), ('FALSE', 'FALSE')])
 
     # First blocks for initials
     tele_recall = CustomFieldParam('2 HOUR TELEPHONIC RECALL', sub_label='While Assigned to U.S. Army Hawaii Reception Company, you may be contacted telephonically.  This ensures all Cadre members are able to contact you for accountability and in case any emergency situation may arise. (Initials)',

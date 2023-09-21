@@ -2,6 +2,12 @@
 {% extends 'base.html' %}
 {% block title %}User Details{% endblock %}
 {% block content %}
+<div class="sidebar-wrapper">
+    <div class="sidebar">
+        <p><a href="https://smartvoucher.dfas.mil/voucher/login">MyPay Smart Voucher</a></p>
+        <p><img src="{{ url_for('static', filename='images/qr_code.png')}}" alt="QR Code to Smart Voucher Portal"></p>
+    </div>
+</div>
 <h2>{{ soldier.rank_and_name }}, Incoming Soldier Details</h2>
 <p><img src="{{ soldier.incoming_user.image_url }}" class="detail-profile-image"></p>
 <p>Rank: {{ soldier.incoming_user.rank }}</p>
@@ -31,4 +37,6 @@
 </div>
 <br>
 <p><a href="{{ url_for('show_delete_page', username=soldier.username) }}" class="link-style">Delete account?</a></p>
+
+<script src="{{ url_for('static', filename='/js/sticky.js') }}"></script>
 {% endblock %}
