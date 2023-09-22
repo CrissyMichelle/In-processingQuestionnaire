@@ -189,6 +189,10 @@ class GetDirectionsForm(FlaskForm):
 class MessageForm(FlaskForm):
     """Form for adding/editing messages"""
     text = TextAreaField('text', validators=[DataRequired()])
+    
+class AARcommentsForm(FlaskForm):
+    """Form for giving feedback to Reception Co."""
+    text = TextAreaField('text', validators=[DataRequired()])
 
 class EditUserForm(FlaskForm):
     """Form for editing user profiles"""

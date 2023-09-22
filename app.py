@@ -6,7 +6,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
-from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -557,7 +557,8 @@ def show_profile_page():
         try:
             u = User.query.filter(User.username == username).one()
             if u.type == "incoming":
-                return redirect(f"/users/{username}")
+                form = AARcommentsForm
+                return redirect(f"/users/{username}", form=form)
             elif u.type == "gainers":
                 return redirect(f"/users/gaining/{username}")
             else:
