@@ -618,6 +618,10 @@ def list_users():
 
     all_incoming = NewSoldier.query.all()
     incoming_names = [{"name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming]
+    DODIDs = [{"DODID": incoming.DODID, "name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming
+              if incoming.DODID is not None]
+    UICs = [{"UIC": incoming.gain_UIC, "name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming
+            if incoming.gain_UIC is not None]
 
     all_gainers = GainingUser.query.all()
     gainer_names = [{"name": gainer.rank_and_name, "id": gainer.gaining_user.id} for gainer in all_gainers]
@@ -625,7 +629,8 @@ def list_users():
     all_cadre = Cadre.query.all()
     cadre_names = [{"name": cadre.rank_and_name, "id": cadre.cadre_user.id} for cadre in all_cadre]
 
-    return jsonify(incoming_names=incoming_names, gainer_names=gainer_names, cadre_names=cadre_names)
+    return jsonify(incoming_names=incoming_names, DODIDs=DODIDs, UICs=UICs,
+                   gainer_names=gainer_names, cadre_names=cadre_names)
 
     
 @app.route('/users/show/<int:user_id>')

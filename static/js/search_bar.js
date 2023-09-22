@@ -6,33 +6,56 @@ const searchAll = [];
 async function fetchUsers() {
     const response = await fetch('/get_all_users');
     const data = await response.json();
-
+    console.log(data);
     const incoming = data.incoming_names;
+    const ids = data.DODIDs;
+    const unit_ids = data.UICs;
     const gainers = data.gainer_names;
     const cadre = data.cadre_names;
 
-    searchAll.push(...incoming, ...gainers, ...cadre);
+    searchAll.push(...incoming, ...ids, ...unit_ids, ...gainers, ...cadre);
 
     function search(str) {
+        console.log(str)
         let results = [];
         if (str.length) {
-            results = str.map(user => {
-                return `<li><a href="/users/show/${user.id}">${user.name}</a></li>`
+            results = str.map(item => {
+                console.log(item);
+                if (item.hasOwnProperty('name')) {
+                    return `<li><a href="/users/show/${item.id}">${item.name}</a></li>`
+                } else if (item.hasOwnProperty('DODID')) {
+                    return `<li><a href="/users/show/${item.id}">${item.name}</a></li>`
+                } else if (item.hasOwnProperty('UIC')) {
+                    return `<li><a href="/users/show/${item.id}">${item.name}</a></li>`
+                }
             });
         }
-
+        console.log(results[0])
         return results;
     }
 
     function searchHandler(e) {
+        console.log("Function searchHandler is being executed.")
+        console.log("All searchable items:", searchAll);
         let chars = input.value;
+        console.log("Input value:", chars, " ", "chars.length:", chars.length > 0);
         let dropResults = [];
-
+       
         if (chars.length) {
             dropResults = searchAll.filter(searchItem => {
-                return searchItem.name.toLowerCase()
-                .includes(chars.toLowerCase())
+                console.log('Checking:', searchItem);
+                if (searchItem.hasOwnProperty('name') && searchItem.name.toLowerCase().includes(chars.toLowerCase())) {
+                    return true;
+                }
+                if (searchItem.hasOwnProperty('DODID') && searchItem.DODID.toString().includes(chars)) {
+                    return true;
+                }
+                if (searchItem.hasOwnProperty('UIC') && searchItem.UIC.toString().toLowerCase().includes(chars.toLowerCase())) {
+                    return true;
+                }
+                return false;                
             });
+            console.log("Filtered items:", dropResults);
         }
 
         return showSuggestions(dropResults);
