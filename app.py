@@ -621,7 +621,9 @@ def edit_profile(username):
 
                 if form.email.data:    
                     editing_user.email=form.email.data
-                if form.rank.data:    
+                if form.alt_email.data:
+                    editing_user.cadre.alt_email=form.alt_email.data
+                if form.rank.data != 'No Change':    
                     editing_user.rank=form.rank.data
                 if form.f_name.data:    
                     editing_user.first_name=form.f_name.data
