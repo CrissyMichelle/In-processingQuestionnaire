@@ -6,7 +6,7 @@
     <p>{{ user.email }} {% if user.phone_number %}
         {{ user.phone_number }}
         {% endif %}
-      </p>
+    </p>
     {% if user.type == 'gainers' %}
       {% if user.gainers.BN %}
         <h3>{{ user.gainers.BN }}</h3>
@@ -33,41 +33,9 @@
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
             <p style="color: black;"><b>{{ message.text }}</b></p>
           </div>
-<!--           
-          <form method="POST" action="/messages/{{ message.id }}/like" class="messages-like">
-            <button data-message-id="{{ message.id }}" id="like-button-{{ message.id }}" class="btn btn-sm like-button {{'btn-primary' if message.id in likes else 'btn-secondary'}}">
-              <i class="fas fa-thumbs-up"></i>
-            </button>
-            <span id="like-counter-{{ message.id }}">{{ message.num_likes }}</span>
-          </form>
-           -->
         </li>
       {% endfor %}
     </ul>
 </div>
-<!-- <div class="col-sm-6">
-    <ul class="list-group" id="messages">
-      {% for like in likes %}
-        <li class="list-group-item">
-          <a href="/users/{{ user.id }}">
-            <img src="{{ user.image_url }}" alt="user image" class="timeline-image">
-          </a>
-          <div class="message-area">
-            <a href="/users/{{ user.id }}">@{{ user.username }}</a>
-            <span class="text-muted">{{ like.timestamp.strftime('%d %B %Y') }}</span>
-            <p>{{ like.text }}</p>
-          </div>
-          {% if user.id != like.message_id %}
-          <form method="POST" action="/messages/{{ like.message_id }}/like" class="messages-like">
-            <button data-message-id="{{ like.message_id }}" id="like-button-{{ like.message_id }}" class="btn btn-sm like-button {{'btn-primary' if like.message_id in likes else 'btn-secondary'}}">
-              <i class="fas fa-thumbs-up"></i>
-            </button>
-            <span id="like-counter-{{ like.message_id }}">{{ like.num_likes }}</span>
-          </form>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul> -->
-  </div>
-  <script src="{{ url_for('static', filename='js/like_actions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/like_actions.js') }}"></script>
 {% endblock %}

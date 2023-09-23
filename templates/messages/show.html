@@ -14,17 +14,6 @@
           <div class="message-area">
             <div class="message-heading">
               <a href="{{ url_for('show_user', user_id=message.user.id) }}">@{{ message.user.username }}</a>
-
-              <!-- {% if user.id != message.user.id %}
-              <div action="/messages/{{ message.id }}/like">
-                <button type="button" class="
-                btn 
-                btn-sm 
-                {{'btn-primary' if message.id in likes else 'btn-secondary'}}">
-                  <i class="fas fa-thumbs-up"></i>
-                </button>
-              </div>
-              {% endif %} -->
             </div>
             <p class="single-message"><b>{{ message.text }}</b></p>
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
@@ -35,6 +24,30 @@
     </div>
     <div class="comment-link-wrapper">
       <a href="{{ url_for('messages_add') }}" class="link-style">Post a new comment</a>
+      <p>See all AAR Comments
+        <!-- Button to open email_suggestions Modal -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#aarModal">
+            Get Email!
+            </button>
+        </p>
+        <!-- The email Modal -->
+        <div class="modal" id="aarModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Authorize Access</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body custom-modal-body">
+                        {% include 'email_aars.html' %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
     </div>
-    </div>
+  </div>
 {% endblock %}

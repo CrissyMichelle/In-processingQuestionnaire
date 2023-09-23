@@ -212,3 +212,9 @@ class AuthGetEmail(FlaskForm):
 
     code = PasswordField("Enter access code", validators=[DataRequired()])
     submit = SubmitField("Email spreadsheet")
+
+class AuthGetAARs(FlaskForm):
+    """Form authorizing email with spreadsheet"""
+
+    code = PasswordField("Enter access code", validators=[DataRequired()])
+    submit = SubmitField("Email AARs")

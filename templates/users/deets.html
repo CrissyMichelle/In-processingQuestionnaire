@@ -23,6 +23,24 @@
 <hr>
 
 <p>Username: {{ soldier.username }}</p>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+      <form action="/post_aar" method="POST">
+        {{ form.csrf_token }}
+        <div>
+          {% if form.text.errors %}
+            {% for error in form.text.errors %}
+              <span class="text-danger">
+            {{ error }}
+          </span>
+            {% endfor %}
+          {% endif %}
+          {{ form.text(placeholder="Send your Sustain/Improve suggestions directly to Reception Company!", class="form-control", rows="3") }}
+        </div>
+        <button class="btn btn-outline-success btn-block">Submit</button>
+      </form>
+    </div>
+  </div>
 <div>
     <p>
         <button class="button-style" onclick="location.href='/users/edit/{{ soldier.username }}';">
