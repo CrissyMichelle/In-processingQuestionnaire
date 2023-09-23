@@ -548,7 +548,9 @@ def show_user_deets(username):
     try:
         s = User.query.filter(User.username == username).one()
         soldier = s.incoming       
-        return render_template("users/deets.html", soldier=soldier, form=form)
+        messages = Messages.query.filter(Messages.user_id == s.id).order_by(Messages.timestamp.desc()).all()
+
+        return render_template("users/deets.html", soldier=soldier, form=form, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/questionnaire")
@@ -800,6 +802,27 @@ def email_suggestions():
     
     return render_template("email_aars.html", form=form)
 
+@app.route("/delete_message/<int:message_id>")
+def delete_message(message_id):
+    """Allow logged-in user to delete their messages"""
+
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
+    username = session['username']
+
+    u = User.query.filter(User.username == username).one()
+    message = Messages.query.get_or_404(message_id)
+
+    if u.id != message.user_id:
+        flash("Unauthorized access.", 'danger')
+        return redirect("/users/profile")
+    db.session.delete(message)
+
+    db.session.commit()
+
+    flash("Message deleted.")
+    return redirect("/users/profile")
 
 @app.route("/resources", methods=["GET", "POST"])
 def show_useful_links():
