@@ -3,10 +3,11 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID
+from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
-from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, CustomFieldParam, GainersForm, CadreForm, MessageForm, AuthGetEmail
+from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
@@ -78,7 +79,7 @@ def signup_form():
         
         # put newly-created username into current browser session
         session['username'] = new_user.username
-        flash(f"Added Incoming User {username}")
+        flash(f"Added User {username}")
 
         return redirect("/questionnaire")
 
@@ -115,13 +116,13 @@ def authorize_gainer_type():
             db.session.commit()
            
             session['username'] = new_user.username
-            flash(f"Added Gaining Unit User {username}")
+            flash(f"Added User {username}")
 
             return redirect("/gainers_form")
         
         else:
             flash("Bad passcode.")
-            return redirect("/register", form=form)
+            return redirect("/register")
         
     return render_template("auth_gainer.html", form=form)
 
@@ -155,13 +156,13 @@ def authorize_cadre_type():
             db.session.commit()
             
             session['username'] = new_user.username
-            flash(f"Added Cadre User {username}")
+            flash(f"Added User {username}")
 
             return redirect("/cadre_form")
         
         else:
             flash("Bad passcode.")
-            return redirect("/register", form=form)
+            return redirect("/register")
         
     return render_template("auth_cadre.html", form=form)
 
@@ -271,6 +272,7 @@ def page_for_inproc_users():
                                 gain_UIC        = gain_UIC,
                                 home_town       = home_town,
                                 known_sponsor   = known_sponsor,
+                                aar_comments    = [],
                                 in_proc_hours   = in_proc_hours,
                                 new_pt          = new_pt,
                                 uniform         = uniform,
@@ -310,6 +312,7 @@ def page_for_inproc_users():
             db.session.rollback()
             return redirect("/logout")
 
+        flash(f"Added Incoming User {username}")
         return redirect(f"/users/{session['username']}")
 
     return render_template("questionnaire.html", form=form)
@@ -367,6 +370,7 @@ def page_for_gaining_users():
             db.session.rollback()
             redirect("/logout")
 
+        flash(f"Added Gaining Unit User {username}")
         return redirect(f"users/gaining/{session['username']}")
 
     return render_template("g-form.html", form=form)
@@ -421,9 +425,37 @@ def page_for_cadre_users():
             db.session.rollback()
             redirect("/logout")
 
+        flash(f"Added Cadre User {username}")
         return redirect(f"users/cadre/{session['username']}")
 
     return render_template("c-form.html", form=form)
+
+@app.route("/post_aar", methods=["POST"])
+def post_aar():
+    """Commit aar comment to database"""
+
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
+    
+    username = session['username']
+    new_arrived = NewSoldier.query.filter(NewSoldier.username == username).one()
+    form = AARcommentsForm()
+
+    if form.is_submitted() and form.validate():
+        if new_arrived.aar_comments is None:
+            new_arrived.aar_comments = []
+        new_arrived.aar_comments.append(form.text.data)
+
+        # Flagging the aar_comments column to signal SQLA to commit the changes
+        flag_modified(new_arrived, "aar_comments")
+        db.session.commit()
+
+        flash("Comments saved to database.")
+        return redirect(f"/users/{username}")
+    else:
+        flash("Routing error.", "danger")
+        return redirect("/resources")
 
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
@@ -505,10 +537,12 @@ def show_user_deets(username):
         flash("Please login or create a new user account.")
         return redirect("/register")
     
+    form = AARcommentsForm()
+
     try:
         s = User.query.filter(User.username == username).one()
-        soldier = s.incoming
-        return render_template("users/deets.html", soldier=soldier)
+        soldier = s.incoming       
+        return render_template("users/deets.html", soldier=soldier, form=form)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/questionnaire")
@@ -556,7 +590,7 @@ def show_profile_page():
 
         try:
             u = User.query.filter(User.username == username).one()
-            if u.type == "incoming":
+            if u.type == "incoming":            
                 return redirect(f"/users/{username}")
             elif u.type == "gainers":
                 return redirect(f"/users/gaining/{username}")
@@ -618,6 +652,10 @@ def list_users():
 
     all_incoming = NewSoldier.query.all()
     incoming_names = [{"name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming]
+    DODIDs = [{"DODID": incoming.DODID, "name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming
+              if incoming.DODID is not None]
+    UICs = [{"UIC": incoming.gain_UIC, "name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming
+            if incoming.gain_UIC is not None]
 
     all_gainers = GainingUser.query.all()
     gainer_names = [{"name": gainer.rank_and_name, "id": gainer.gaining_user.id} for gainer in all_gainers]
@@ -625,7 +663,8 @@ def list_users():
     all_cadre = Cadre.query.all()
     cadre_names = [{"name": cadre.rank_and_name, "id": cadre.cadre_user.id} for cadre in all_cadre]
 
-    return jsonify(incoming_names=incoming_names, gainer_names=gainer_names, cadre_names=cadre_names)
+    return jsonify(incoming_names=incoming_names, DODIDs=DODIDs, UICs=UICs,
+                   gainer_names=gainer_names, cadre_names=cadre_names)
 
     
 @app.route('/users/show/<int:user_id>')
@@ -692,9 +731,61 @@ def show_messages():
         return redirect("/")
     username = session['username']
     app_user = User.query.filter(User.username == username).one()
+    form = AuthGetAARs()
 
     messages = Messages.query.all()
-    return render_template('messages/show.html', messages=messages, user=app_user)
+    return render_template('messages/show.html', messages=messages, user=app_user, form=form)
+
+@app.route("/email_suggestions", methods=["GET", "POST"])
+def email_suggestions():
+    """Send email with AAR comments"""
+
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
+    
+    username = session['username']
+    auth_user = User.query.filter(User.username == username).one()
+
+    form = AuthGetAARs()
+    entered_code = None
+    correct_code = GET_AARs
+
+    if form.is_submitted() and form.validate():
+        entered_code = form.code.data
+        
+        if entered_code == correct_code:
+            # Retrieve data from incoming users in the User class
+            user_data = User.query.filter(and_(User.type == 'incoming', User.incoming.has(NewSoldier.aar_comments != None))).all()
+            # Convert user data into a pandas data frame
+            user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
+                                    user.phone_number, user.incoming.arrival_datetime, user.incoming.report_bldg1020,
+                                    user.incoming.aar_comments) for user in user_data],
+                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
+                                            'AAR Comments'])
+            # Create excel file
+            excel_path = 'user_data.xlsx'
+            user_df.to_excel(excel_path, index=False)
+
+            auth_user = auth_user.email
+
+            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[auth_user])
+            msg.body = "See attached for AAR comments"
+            with app.open_resource(excel_path) as fp:
+                msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+            mail.send(msg)
+
+            # Clean up by removing the excel file after sending
+            os.remove(excel_path)
+
+            flash('Email sent!')
+            return redirect("/messages/show")
+        else:
+            flash("Bad access code.", "danger")
+            return redirect("/messages/show")
+    
+    return render_template("email_aars.html", form=form)
+
 
 @app.route("/resources", methods=["GET", "POST"])
 def show_useful_links():

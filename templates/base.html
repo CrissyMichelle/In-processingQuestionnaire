@@ -23,7 +23,11 @@
         <p class="flash-message">{{ msg }}</p>
     {% endfor %}<hr>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-      <a class="navbar-brand" href="/">Soldier Profile</a>
+      {% if session['username'] %}  
+        <a class="navbar-brand" href="{{ url_for('show_user_deets', username=session['username']) }}">Soldier Profile</a>
+      {% else %}
+        <a class="navbar-brand" href="/register">New Account</a>
+      {% endif %}
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" href="/messages/show">Comment Section</a></li>
         <li class="nav-item"><a class="nav-link" href="/resources">Address/Phone</a></li>
@@ -39,7 +43,7 @@
       <div class="nav-item search-wrapper">
         <p id="search-bar-title">Soldier LookUp</p>
         <div class="search-container">            
-          <input type="text" placeholder="Type in a rank or name" id="search-bar">            
+          <input type="text" placeholder="Type in a rank+name or ID code" id="search-bar">            
           <div class="suggestions"></div>
         </div>
       </div>

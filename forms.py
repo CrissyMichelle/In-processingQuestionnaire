@@ -189,6 +189,10 @@ class GetDirectionsForm(FlaskForm):
 class MessageForm(FlaskForm):
     """Form for adding/editing messages"""
     text = TextAreaField('text', validators=[DataRequired()])
+    
+class AARcommentsForm(FlaskForm):
+    """Form for giving feedback to Reception Co."""
+    text = TextAreaField('text', validators=[DataRequired()])
 
 class EditUserForm(FlaskForm):
     """Form for editing user profiles"""
@@ -208,3 +212,9 @@ class AuthGetEmail(FlaskForm):
 
     code = PasswordField("Enter access code", validators=[DataRequired()])
     submit = SubmitField("Email spreadsheet")
+
+class AuthGetAARs(FlaskForm):
+    """Form authorizing email with spreadsheet"""
+
+    code = PasswordField("Enter access code", validators=[DataRequired()])
+    submit = SubmitField("Email AARs")

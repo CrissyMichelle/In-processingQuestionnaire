@@ -78,7 +78,7 @@ class NewSoldier(db.Model):
     lose_UIC = db.Column(db.Text)
     home_town = db.Column(db.Text)
     known_sponsor = db.Column(db.Boolean)
-    aar_comments = db.Column(db.Text)
+    aar_comments = db.Column(db.ARRAY(db.Text))
 
     # Initialed fields for accountability
     tele_recall = db.Column(db.Text)
