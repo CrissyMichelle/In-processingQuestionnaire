@@ -510,11 +510,17 @@ def send_email():
             user_df.to_excel(excel_path, index=False)
 
             cadre_member = cadre_user.email
+            recipients = [cadre_member]
 
-            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+            if cadre_user.cadre.alt_email is not None:
+                alt_email = cadre_user.cadre.alt_email
+                recipients.append(alt_email)
+
+            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=recipients)
             msg.body = "See attached for incoming personnel data"
             with app.open_resource(excel_path) as fp:
                 msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+            
             mail.send(msg)
 
             # Clean up by removing the excel file after sending
@@ -769,12 +775,18 @@ def email_suggestions():
             excel_path = 'user_data.xlsx'
             user_df.to_excel(excel_path, index=False)
 
-            auth_user = auth_user.email
+            primary_email = auth_user.email
+            recipients = [primary_email]
 
-            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[auth_user])
+            if auth_user.type == 'cadre' and auth_user.cadre.alt_email is not None:
+                alt_email = auth_user.cadre.alt_email
+                recipients.append(alt_email)
+
+            msg = Message('Incoming Reception Co. Feedback', sender='crissymichelle@proton.me', recipients=recipients)
             msg.body = "See attached for AAR comments"
             with app.open_resource(excel_path) as fp:
                 msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+
             mail.send(msg)
 
             # Clean up by removing the excel file after sending

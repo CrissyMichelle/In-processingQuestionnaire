@@ -9,6 +9,9 @@
 <p>Last Name: {{ soldier.cadre_user.last_name }}</p>
 <p>Role: {{ soldier.role }}</p>
 <p>email: {{ soldier.cadre_user.email }}</p>
+{% if soldier.alt_email %}
+    <p>alt email: {{ soldier.alt_email }}</p>
+{% endif %}
 <p>phone: {{ soldier.cadre_user.phone_number }}</p>
 <p>Bio: {{ soldier.cadre_user.bio }}</p>
 <p>Last Login: {{ soldier.cadre_user.last_login }}</p>
