@@ -23,19 +23,26 @@
     {% endif %}
     <p>Bio: {{ user.bio }}</p>
 </h2>
-<div class="col-sm-6">
-    <ul class="list-group" id="messages">
-      {% for message in messages %}
-        <li class="list-group-item">
-          </a>
-          <div class="message-area">
-            <a href="/users/show/{{ user.id }}">@{{ user.username }}</a>
-            <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
-            <p style="color: black;"><b>{{ message.text }}</b></p>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
+<div class="bg">
+  {% if messages != None %}
+    <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+      <div class="col-md-6" style="max-width: 600px;">
+        <ul class="list-group" id="messages">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="message-area">
+                <a href="/users/show/{{ user.id }}">@{{ user.username }}</a>
+                <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+                <p style="color: black;">
+                  <b>{{ message.text }}</b>
+                </p>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
 </div>
 <script src="{{ url_for('static', filename='js/like_actions.js') }}"></script>
 {% endblock %}
