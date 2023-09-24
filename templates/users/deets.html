@@ -20,7 +20,7 @@
 <br>
 <p>Role: {{ soldier.role }}</p>
 <p>Bio: {{ soldier.incoming_user.bio }}</p>
-<p>Last Login: {{ soldier.incoming_user.last_login }}</p>
+<p>Last Login: {{ soldier.incoming_user.last_login.strftime('%d %B %Y')  }}</p>
 <hr>
 <p>Username: {{ soldier.username }}</p>
 <div class="bg">

@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 bcrypt = Bcrypt()
 db =  SQLAlchemy()
@@ -27,7 +28,7 @@ class User(db.Model):
         default="/static/images/REPLCO_logo.png",
     )
     bio = db.Column(db.Text)
-    last_login = db.Column(db.DateTime)
+    last_login = db.Column(db.DateTime, default=datetime.utcnow())
     newSoldier_id = db.Column(db.Integer, db.ForeignKey('incoming.id', ondelete='cascade'))
     cadre_id = db.Column(db.Integer, db.ForeignKey('cadre.id', ondelete='cascade'))
     gainUnit_userid = db.Column(db.Integer, db.ForeignKey('gainers.id', ondelete='cascade'))

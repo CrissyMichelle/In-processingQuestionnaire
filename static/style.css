@@ -223,3 +223,13 @@ h1 {
     height: 150px;
     border-radius: 5px;
 }
+
+.tel-link {
+    color: skyblue;
+    text-decoration: none;
+}
+
+.tel-link:hover {
+    color: #007bff;
+    text-decoration: underline;
+}

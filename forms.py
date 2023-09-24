@@ -200,7 +200,7 @@ class EditUserForm(FlaskForm):
     email = StringField('email')
     alt_email = StringField('Alternative or civilian email')
     rank = SelectField("Rank:", validators=[InputRequired()],
-                       choices=[('No Change', 'No Change'), ('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
+                       choices=[('No Change', 'rank --No Change--'), ('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
                                 ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
                                 ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
                                 ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
