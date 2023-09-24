@@ -552,7 +552,7 @@ def show_user_deets(username):
 
         return render_template("users/deets.html", soldier=soldier, form=form, messages=messages)
     except Exception as e:
-        flash(f"An error occurred: {e}")
+        flash(f"Oops {e}. Please fill out the form.")
         return redirect("/questionnaire")
 
 @app.route("/users/gaining/<username>")
@@ -570,7 +570,7 @@ def show_gaining_user(username):
 
         return render_template("users/gainers.html", soldier=gaining_unit_user, messages=messages)
     except Exception as e:
-        flash(f"An error occurred: {e}")
+        flash(f"Oops {e}. Please fill out the form.")
         return redirect("/gainers_form")
 
 @app.route("/users/cadre/<username>")
@@ -590,7 +590,7 @@ def show_cadre_user(username):
 
         return render_template("users/cadre.html", soldier=cadre_user, form=form, messages=messages)
     except Exception as e:
-        flash(f"An error occurred: {e}")
+        flash(f"Oops {e}. Please fill out the form.")
         return redirect("/cadre_form")
 
 @app.route("/users/profile")
