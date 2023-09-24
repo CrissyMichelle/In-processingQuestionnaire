@@ -566,7 +566,9 @@ def show_gaining_user(username):
     try:
         g = User.query.filter(User.username == username).one()
         gaining_unit_user = g.gainers
-        return render_template("users/gainers.html", soldier=gaining_unit_user)
+        messages = Messages.query.filter(Messages.user_id == g.id).order_by(Messages.timestamp.desc()).all()
+
+        return render_template("users/gainers.html", soldier=gaining_unit_user, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/gainers_form")
@@ -582,9 +584,11 @@ def show_cadre_user(username):
     try:
         c = User.query.filter(User.username == username).one()
         cadre_user = c.cadre
+        messages = Messages.query.filter(Messages.user_id == c.id).order_by(Messages.timestamp.desc()).all()
+
         form = AuthGetEmail()
 
-        return render_template("users/cadre.html", soldier=cadre_user, form=form)
+        return render_template("users/cadre.html", soldier=cadre_user, form=form, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/cadre_form")
@@ -637,6 +641,15 @@ def edit_profile(username):
                     editing_user.first_name=form.f_name.data
                 if form.l_name.data:    
                     editing_user.last_name=form.l_name.data
+
+                if form.role.data:
+                    if editing_user.type == 'incoming':
+                        editing_user.incoming.role=form.role.data
+                    elif editing_user.type == 'gainers':
+                        editing_user.gainers.role=form.role.data
+                    elif editing_user.type == 'cadre':
+                        editing_user.cadre.role=form.role.data
+
                 if form.telephone.data:    
                     editing_user.phone_number=form.telephone.data
                 if form.image_url.data:
@@ -743,7 +756,7 @@ def show_messages():
     app_user = User.query.filter(User.username == username).one()
     form = AuthGetAARs()
 
-    messages = Messages.query.all()
+    messages = Messages.query.order_by(Messages.timestamp.desc()).all()
     return render_template('messages/show.html', messages=messages, user=app_user, form=form)
 
 @app.route("/email_suggestions", methods=["GET", "POST"])

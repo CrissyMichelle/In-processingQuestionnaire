@@ -34,7 +34,7 @@ wardawg = User(username='wardawg', password ='killKillKILL', email="claude.v.day
 
 captain = User(username='cptO3', password ='cpt03', email="jack.b.reacher.not@4real.com", type="cadre",
                rank='CPT', first_name="Jack", last_name="Reacher", phone_number='808-555-5555')
-me = User(username='cmc', password ='123456', email="xxxxxx.x.not@4real.com", type="cadre",
+me = User(username='cmc', password ='123456', email="xxxxxx.x.xxxxxxx@notmail.com", type="cadre",
                rank='SFC', first_name="Michelle", last_name="Cobra", phone_number='777-777-7777',
                image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAL8dUDsl1jHCZ-BMdHXLm4FOexiZnf6KBSA&usqp=CAU',
                bio='From a nice hometown, been in the Army 16 years, lifelong learner. I love using emerging tech to help out my fellow Soldiers!')
@@ -84,7 +84,7 @@ warrior = NewSoldier(id=28034500, arrival_datetime=datetime(2023, 8, 4, 4), user
     gtc = 'CD',
     tla = 'CD',
     hotels = 'CD')
-reacher = Cadre(id=64888999, role='commander', username=captain.username)
+reacher = Cadre(id=64888999, role='Automation OIC', username=captain.username)
 author = Cadre(id=888888888, role='Software Dev', username=me.username)
 oneal = GainingUser(id=9999999, BDE='3IBCT', BN='3-4CAV', role="squad leader", username=april.username)
 yolo = GainingUser(id=8899999, BDE='2IBCT', BN='1-27', unit="A Co.", role="squad leader", username=yody.username)
@@ -104,7 +104,7 @@ db.session.add(oneal)
 db.session.add(yolo)
 db.session.commit()
 
-message1 = Messages(text="where can i get vegan poke?", timestamp = datetime(2023, 8, 22, 8, 22), user_id = wardawg.id)
+message1 = Messages(text="where can i get vegan poke?", timestamp = datetime(2023, 9, 22, 8, 22), user_id = wardawg.id)
 db.session.add(message1)
 db.session.commit()
 message2 = Messages(text="chess is the best", timestamp = datetime(2023, 8, 23, 16, 21), user_id = me.id)

@@ -208,6 +208,7 @@ class EditUserForm(FlaskForm):
                                 ('wo1', 'WO1'), ('CW2', 'CW2'), ('CW3', 'CW3'), ('CW4', 'CW4'), ('CW5', 'CW5')])
     f_name = StringField('First Name')
     l_name = StringField('Last Name')
+    role = StringField('Role or Position')
     telephone = StringField('Phone Number')
     image_url = StringField('Profile Pic url')
     bio = StringField('Bio')

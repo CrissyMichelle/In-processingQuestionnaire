@@ -42,6 +42,34 @@
 </div>
 <hr>
 <p>Username: {{ soldier.username }}</p>
+<div class="bg">
+    {% if messages != None %}
+      <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+        <div class="col-md-6" style="max-width: 600px;">
+          <ul class="list-group no-hover" id="messages">
+            {% for message in messages %}
+            <li class="list-group-item">
+              <a href="{{ url_for('show_user', user_id=message.user.id) }}">
+                <img src="{{ message.user.image_url }}" alt="" class="timeline-image">
+              </a>
+              <div class="message-area">
+                <div class="message-heading">
+                  <a href="{{ url_for('show_user', user_id=message.user.id) }}">@{{ message.user.username }}</a>
+                </div>
+                <p class="single-message">
+                  <b>{{ message.text }}</b>
+                  <a href="{{ url_for('delete_message', message_id=message.id) }}">Delete</a>
+                </p>
+                <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+<hr>
 <div>
     <p>
         <button class="button-style" onclick="location.href='/users/edit/{{ soldier.username }}';">

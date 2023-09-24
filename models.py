@@ -113,7 +113,7 @@ class Cadre(db.Model):
     __tablename__ = 'cadre'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    role = db.Column(db.Text)
+    role = db.Column(db.Text, default="Cadre")
     alt_email = db.Column(db.String)
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
@@ -129,7 +129,7 @@ class GainingUser(db.Model):
     BDE = db.Column(db.Text)
     BN = db.Column(db.Text)
     unit = db.Column(db.Text)
-    role = db.Column(db.Text)
+    role = db.Column(db.Text, default="Gaining Unit Representative")
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
 
     @property
