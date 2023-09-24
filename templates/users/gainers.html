@@ -21,7 +21,7 @@
 <p>Unit: {{ soldier.unit }}</p>
 <br>
 <p>Bio: {{ soldier.gaining_user.bio }}</p>
-<p>Last Login: {{ soldier.gaining_user.last_login }}</p>
+<p>Last Login: {{ soldier.gaining_user.last_login.strftime('%d %B %Y')  }}</p>
 <hr>
 <p>Username: {{ soldier.username }}</p>
 <div class="bg">

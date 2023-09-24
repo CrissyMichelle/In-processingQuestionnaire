@@ -14,7 +14,7 @@
 {% endif %}
 <p>phone: {{ soldier.cadre_user.phone_number }}</p>
 <p>Bio: {{ soldier.cadre_user.bio }}</p>
-<p>Last Login: {{ soldier.cadre_user.last_login }}</p>
+<p>Last Login: {{ soldier.cadre_user.last_login.strftime('%d %B %Y')  }}</p>
 <br>
 <hr>
 <p>Need a Spreadsheet?

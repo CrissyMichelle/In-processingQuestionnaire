@@ -22,6 +22,7 @@
         <h3>{{ user.incoming.role }}</h3>
     {% endif %}
     <p>Bio: {{ user.bio }}</p>
+    <p>Last Login: {{ user.last_login.strftime('%d %B %Y') }}</p>
 </h2>
 <div class="bg">
   {% if messages != None %}
