@@ -56,7 +56,7 @@ def signup_form():
     """Shows form for registering/creating a new user and handles submission."""
     # but first, logged in users can't create a new user
     if "username" in session:
-        flash(f"You can create a new user. But {session['username']} must logout first!")
+        flash(f"Sorry. {session['username']} needs to logout!", 'danger')
         return redirect("/logout")
     
     form = CreateUserForm()
@@ -91,7 +91,7 @@ def authorize_gainer_type():
     """Shows modal for verifying gainer user type"""
 
     if "username" in session:
-        flash(f"You can create a new user. But {session['username']} must logout first!")
+        flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
         return redirect("/logout")
     
     form = CreateUserForm()
@@ -109,7 +109,7 @@ def authorize_gainer_type():
             existing_user = User.query.filter_by(username=username).first()
             if existing_user:
                 flash("Username already taken, please choose another.")
-                return redirect("/register", form=form)
+                return redirect("/register")
             
             new_user = User.register(username=username, pwd=password, email=email, type='gainers')
             db.session.add(new_user)
@@ -131,7 +131,7 @@ def authorize_cadre_type():
     """Shows modal for verifying cadre user type"""
 
     if "username" in session:
-        flash(f"You can create a new user. But {session['username']} must logout first!")
+        flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
         return redirect("/logout")
     
     form = CreateUserForm()
@@ -149,7 +149,7 @@ def authorize_cadre_type():
             existing_user = User.query.filter_by(username=username).first()
             if existing_user:
                 flash("Username already taken, please choose another.")
-                return redirect("/register", form=form)
+                return redirect("/register")
             
             new_user = User.register(username=username, pwd=password, email=email, type='cadre')
             db.session.add(new_user)
@@ -665,7 +665,7 @@ def edit_profile(username):
                 flash("Issue with form validation", 'danger')                      
                 return render_template("users/edit.html", form=form)            
         flash("Bad Password", 'danger')
-        return redirect("/")
+        return redirect("/users/profile")
     
     else:
         return render_template("users/edit.html", form=form, soldier=u)
@@ -762,6 +762,9 @@ def show_messages():
         return redirect("/")
     username = session['username']
     app_user = User.query.filter(User.username == username).one()
+    if app_user.newSoldier_id is None and app_user.gainUnit_userid is None and app_user.cadre_id is None:
+        return redirect("/users/profile")
+    
     form = AuthGetAARs()
 
     messages = Messages.query.order_by(Messages.timestamp.desc()).all()
