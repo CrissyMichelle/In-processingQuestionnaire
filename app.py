@@ -658,6 +658,7 @@ def edit_profile(username):
                     editing_user.bio=form.bio.data
 
                 db.session.commit()
+                flash("Profile updated!")
                 return redirect("/users/profile")
                 
             except IntegrityError: 
@@ -668,6 +669,13 @@ def edit_profile(username):
     
     else:
         return render_template("users/edit.html", form=form, soldier=u)
+    
+@app.route('/cancel_edit')
+def cancel_edit():
+    """Provides flash message for user's cancellation of edits"""
+
+    flash("Editing canceled")
+    return redirect("/users/profile")
 
 @app.route('/get_all_users')
 def list_users():
