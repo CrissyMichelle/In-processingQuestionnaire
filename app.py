@@ -552,7 +552,7 @@ def show_user_deets(username):
 
         return render_template("users/deets.html", soldier=soldier, form=form, messages=messages)
     except Exception as e:
-        flash(f"Oops {e}. Please fill out the form.")
+        flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/questionnaire")
 
 @app.route("/users/gaining/<username>")
@@ -570,7 +570,7 @@ def show_gaining_user(username):
 
         return render_template("users/gainers.html", soldier=gaining_unit_user, messages=messages)
     except Exception as e:
-        flash(f"Oops {e}. Please fill out the form.")
+        flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/gainers_form")
 
 @app.route("/users/cadre/<username>")
@@ -590,7 +590,7 @@ def show_cadre_user(username):
 
         return render_template("users/cadre.html", soldier=cadre_user, form=form, messages=messages)
     except Exception as e:
-        flash(f"Oops {e}. Please fill out the form.")
+        flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/cadre_form")
 
 @app.route("/users/profile")
@@ -717,16 +717,20 @@ def show_delete_page(username):
          raise Unauthorized()
 
     s = User.query.filter(User.username == username).one()
-    soldier = s.incoming
-    # if POST request, we'll go ahead and delete the user
+    posts = s.messages
+
+    # if POST request, we'll go ahead and delete the user and their messages
     if request.method == 'POST':
+        for post in posts:
+            db.session.delete(post)
         db.session.delete(s)
         db.session.commit()
+
         session.pop("username")
     # and redirect to the login page
         return redirect("/login")
 
-    return render_template("/users/delete.html", soldier=soldier)
+    return render_template("/users/delete.html", soldier=s)
 
 ################################# Extras ################################
 @app.route('/messages/new', methods=["GET", "POST"])
@@ -749,6 +753,7 @@ def messages_add():
         app_user.messages.append(msg)
         db.session.commit()
 
+        flash("Message posted!")
         return redirect("/messages/show")
 
     return render_template('messages/new.html', form=form)
@@ -764,11 +769,11 @@ def show_messages():
     app_user = User.query.filter(User.username == username).one()
     if app_user.newSoldier_id is None and app_user.gainUnit_userid is None and app_user.cadre_id is None:
         return redirect("/users/profile")
-    
-    form = AuthGetAARs()
 
+    form = AuthGetAARs()
     messages = Messages.query.order_by(Messages.timestamp.desc()).all()
-    return render_template('messages/show.html', messages=messages, user=app_user, form=form)
+
+    return render_template('messages/show.html', messages=messages, user=app_user, form=form)                                                         
 
 @app.route("/email_suggestions", methods=["GET", "POST"])
 def email_suggestions():
