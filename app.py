@@ -510,11 +510,17 @@ def send_email():
             user_df.to_excel(excel_path, index=False)
 
             cadre_member = cadre_user.email
+            recipients = [cadre_member]
 
-            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[cadre_member])
+            if cadre_user.cadre.alt_email is not None:
+                alt_email = cadre_user.cadre.alt_email
+                recipients.append(alt_email)
+
+            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=recipients)
             msg.body = "See attached for incoming personnel data"
             with app.open_resource(excel_path) as fp:
                 msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+            
             mail.send(msg)
 
             # Clean up by removing the excel file after sending
@@ -542,7 +548,9 @@ def show_user_deets(username):
     try:
         s = User.query.filter(User.username == username).one()
         soldier = s.incoming       
-        return render_template("users/deets.html", soldier=soldier, form=form)
+        messages = Messages.query.filter(Messages.user_id == s.id).order_by(Messages.timestamp.desc()).all()
+
+        return render_template("users/deets.html", soldier=soldier, form=form, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/questionnaire")
@@ -558,7 +566,9 @@ def show_gaining_user(username):
     try:
         g = User.query.filter(User.username == username).one()
         gaining_unit_user = g.gainers
-        return render_template("users/gainers.html", soldier=gaining_unit_user)
+        messages = Messages.query.filter(Messages.user_id == g.id).order_by(Messages.timestamp.desc()).all()
+
+        return render_template("users/gainers.html", soldier=gaining_unit_user, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/gainers_form")
@@ -574,9 +584,11 @@ def show_cadre_user(username):
     try:
         c = User.query.filter(User.username == username).one()
         cadre_user = c.cadre
+        messages = Messages.query.filter(Messages.user_id == c.id).order_by(Messages.timestamp.desc()).all()
+
         form = AuthGetEmail()
 
-        return render_template("users/cadre.html", soldier=cadre_user, form=form)
+        return render_template("users/cadre.html", soldier=cadre_user, form=form, messages=messages)
     except Exception as e:
         flash(f"An error occurred: {e}")
         return redirect("/cadre_form")
@@ -621,12 +633,23 @@ def edit_profile(username):
 
                 if form.email.data:    
                     editing_user.email=form.email.data
-                if form.rank.data:    
+                if form.alt_email.data:
+                    editing_user.cadre.alt_email=form.alt_email.data
+                if form.rank.data != 'No Change':    
                     editing_user.rank=form.rank.data
                 if form.f_name.data:    
                     editing_user.first_name=form.f_name.data
                 if form.l_name.data:    
                     editing_user.last_name=form.l_name.data
+
+                if form.role.data:
+                    if editing_user.type == 'incoming':
+                        editing_user.incoming.role=form.role.data
+                    elif editing_user.type == 'gainers':
+                        editing_user.gainers.role=form.role.data
+                    elif editing_user.type == 'cadre':
+                        editing_user.cadre.role=form.role.data
+
                 if form.telephone.data:    
                     editing_user.phone_number=form.telephone.data
                 if form.image_url.data:
@@ -733,7 +756,7 @@ def show_messages():
     app_user = User.query.filter(User.username == username).one()
     form = AuthGetAARs()
 
-    messages = Messages.query.all()
+    messages = Messages.query.order_by(Messages.timestamp.desc()).all()
     return render_template('messages/show.html', messages=messages, user=app_user, form=form)
 
 @app.route("/email_suggestions", methods=["GET", "POST"])
@@ -767,12 +790,18 @@ def email_suggestions():
             excel_path = 'user_data.xlsx'
             user_df.to_excel(excel_path, index=False)
 
-            auth_user = auth_user.email
+            primary_email = auth_user.email
+            recipients = [primary_email]
 
-            msg = Message('Incoming Reception Co. Personnel', sender='crissymichelle@proton.me', recipients=[auth_user])
+            if auth_user.type == 'cadre' and auth_user.cadre.alt_email is not None:
+                alt_email = auth_user.cadre.alt_email
+                recipients.append(alt_email)
+
+            msg = Message('Incoming Reception Co. Feedback', sender='crissymichelle@proton.me', recipients=recipients)
             msg.body = "See attached for AAR comments"
             with app.open_resource(excel_path) as fp:
                 msg.attach(excel_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+
             mail.send(msg)
 
             # Clean up by removing the excel file after sending
@@ -786,6 +815,27 @@ def email_suggestions():
     
     return render_template("email_aars.html", form=form)
 
+@app.route("/delete_message/<int:message_id>")
+def delete_message(message_id):
+    """Allow logged-in user to delete their messages"""
+
+    if "username" not in session:
+        flash("Please login or create a new user account.")
+        return redirect("/register")
+    username = session['username']
+
+    u = User.query.filter(User.username == username).one()
+    message = Messages.query.get_or_404(message_id)
+
+    if u.id != message.user_id:
+        flash("Unauthorized access.", 'danger')
+        return redirect("/users/profile")
+    db.session.delete(message)
+
+    db.session.commit()
+
+    flash("Message deleted.")
+    return redirect("/users/profile")
 
 @app.route("/resources", methods=["GET", "POST"])
 def show_useful_links():

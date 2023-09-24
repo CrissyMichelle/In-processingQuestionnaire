@@ -198,9 +198,17 @@ class EditUserForm(FlaskForm):
     """Form for editing user profiles"""
     
     email = StringField('email')
-    rank = StringField('Rank')
+    alt_email = StringField('Alternative or civilian email')
+    rank = SelectField("Rank:", validators=[InputRequired()],
+                       choices=[('No Change', 'No Change'), ('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
+                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
+                                ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
+                                ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
+                                ('COL', 'COL'), ('BG', 'BG'), ('MG', 'MG'), ('LTG', 'LTG'), ('GEN', 'GEN'), ('GA', 'GA'),
+                                ('wo1', 'WO1'), ('CW2', 'CW2'), ('CW3', 'CW3'), ('CW4', 'CW4'), ('CW5', 'CW5')])
     f_name = StringField('First Name')
     l_name = StringField('Last Name')
+    role = StringField('Role or Position')
     telephone = StringField('Phone Number')
     image_url = StringField('Profile Pic url')
     bio = StringField('Bio')
