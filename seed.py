@@ -114,3 +114,25 @@ db.session.add(message3)
 message4 = Messages(text="YODY!!", timestamp = datetime(2023, 9, 7, 15, 21), user_id = yody.id)
 db.session.add(message4)
 db.session.commit()
+
+def seed_database():
+    db.session.add(snuffle)
+    db.session.add(wardawg)
+    db.session.add(captain)
+    db.session.add(me)
+    db.session.add(april)
+    db.session.add(yody)
+
+    db.session.commit()
+
+    db.session.add(snuffy)
+    db.session.add(warrior)
+    db.session.add(reacher)
+    db.session.add(author)
+    db.session.add(oneal)
+    db.session.add(yolo)
+
+    db.session.commit()
+
+    db.session.add(message4)
+    db.session.commit()         
