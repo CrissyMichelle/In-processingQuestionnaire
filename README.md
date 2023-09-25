@@ -1,6 +1,6 @@
 # Reception Company In-processing Questionnaire Application
+Live Demo: [Visit the Site](https://replco-in-processing.onrender.com)
 ![Link to logo](https://github.com/CrissyMichelle/In-processingQuestionnaire/blob/main/static/images/ReceptionCompanyLogo.png)
-![Link to site](https://replco-in-processing.onrender.com)
 
 ## Prototype demo web app for capturing newly arrived personnel data
 1. Service members arrive on-island and meet Reception Company Cadre at the airport.
