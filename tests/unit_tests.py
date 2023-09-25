@@ -16,7 +16,7 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
 csrf = CSRFProtect(app)
 
 class CreateUserFormTestCase(TestCase):
-    """Uncover source of extra_validators error"""
+    """Test app's initial form"""
     def setUp(self):
         self.app = app
         app.config.from_object(TestConfig)
