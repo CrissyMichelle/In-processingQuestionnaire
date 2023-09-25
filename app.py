@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
+# from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
@@ -17,12 +17,12 @@ app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 # logging.basicConfig(level=logging.INFO)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
-app.config["SECRET_KEY"] = SECRET_KEY
+app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
@@ -33,7 +33,7 @@ app.config['MAIL_PORT'] = '587'
 # app.config['MAIL_USERNAME'] = 'crissymichelle@proton.me'
 app.config['MAIL_USERNAME'] = 'apikey'
 # app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_PASSWORD'] = SEND_GRID
+app.config['MAIL_PASSWORD'] = os.environ.get('SEND_GRID')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
@@ -470,7 +470,7 @@ def send_email():
 
     form = AuthGetEmail()
     entered_code = None
-    correct_code = GET_EMAIL
+    correct_code = os.environ.get('GET_EMAIL')
 
     if form.is_submitted() and form.validate():
         entered_code = form.code.data
@@ -788,7 +788,7 @@ def email_suggestions():
 
     form = AuthGetAARs()
     entered_code = None
-    correct_code = GET_AARs
+    correct_code = os.environ.get('GET_AARs')
 
     if form.is_submitted() and form.validate():
         entered_code = form.code.data
