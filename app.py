@@ -702,6 +702,10 @@ def list_users():
 def show_user(user_id):
     """Shows user profile and user's messages"""
 
+    if "username" not in session:
+        flash("Please login!", "danger")
+        return redirect("/login")
+    
     user = User.query.get_or_404(user_id)
 
     messages = (Messages.query.filter(Messages.user_id == user_id)
