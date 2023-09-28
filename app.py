@@ -768,7 +768,7 @@ def show_messages():
 
     if "username" not in session:
         flash("You must be logged in to see messages!", "danger")
-        return redirect("/")
+        return redirect("/login")
     username = session['username']
     app_user = User.query.filter(User.username == username).one()
     if app_user.newSoldier_id is None and app_user.gainUnit_userid is None and app_user.cadre_id is None:
