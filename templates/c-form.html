@@ -1,0 +1,31 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}In-Processing Questionnaire{% endblock %}
+{% block content %}
+<h3>
+    <p>For Reception Company Cadre using this application:</p>
+</h3>    
+    <i><p>Please fill out and submit.</p></i>
+<div class="form-container">
+    <form id="c-form" method="POST">
+        {{ form.hidden_tag() }}
+        {% for field in form
+            if field.widget.input_type != 'hidden' %}
+            <p>
+                <b>{{ field.label }}</b>    
+                {% if field.sub_label %}
+                    <p class="sub-label">{{ field.sub_label }}</p>
+                {% endif %}
+                {{ field }}
+                {% for error in field.errors %}
+                    <div class="server-side-warning">{{ error }}</div>
+                {% endfor %}
+                <br><br>
+            </p>
+        {% endfor %}
+        <button type="submit" class="button-style">Submit</button>
+    </form>
+</div>
+<hr><hr><hr>
+<script src="{{ url_for('static', filename='js/form_phone.js') }}"></script>
+{% endblock %}

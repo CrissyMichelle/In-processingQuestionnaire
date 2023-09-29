@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<img src="{{ user.image_url }}" alt="user profile pic" class="detail-profile-image">
+<h2>
+    <p>{{ user.rank_and_name }}</p>
+    <p>{{ user.email }} {% if user.phone_number %}
+        {{ user.phone_number }}
+        {% endif %}
+    </p>
+    {% if user.type == 'gainers' %}
+      {% if user.gainers.BN %}
+        <h3>{{ user.gainers.BN }}</h3>
+      {% endif %}
+      {% if user.gainers.unit %}
+        <h3>{{ user.gainers.unit }}</h3>
+      {% endif %}
+      <h3>{{ user.gainers.role }}</h3>
+    {% elif user.type == 'cadre' %}
+        <p>Reception Company Cadre Member</p>
+        <h3>{{ user.cadre.role }}</h3>
+    {% elif user.type == 'incoming' %}
+        <h3>{{ user.incoming.role }}</h3>
+    {% endif %}
+    <p>Bio: {{ user.bio }}</p>
+    <p>Last Login: {{ user.last_login.strftime('%d %B %Y') }}</p>
+</h2>
+<div class="bg">
+  {% if messages != None %}
+    <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+      <div class="col-md-6" style="max-width: 600px;">
+        <ul class="list-group" id="messages">
+          {% for message in messages %}
+            <li class="list-group-item">
+              <div class="message-area">
+                <a href="/users/show/{{ user.id }}">@{{ user.username }}</a>
+                <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+                <p style="color: black;">
+                  <b>{{ message.text }}</b>
+                </p>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+</div>
+<script src="{{ url_for('static', filename='js/like_actions.js') }}"></script>
+{% endblock %}

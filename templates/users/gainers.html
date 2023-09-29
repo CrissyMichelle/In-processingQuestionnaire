@@ -1,0 +1,69 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}User Details{% endblock %}
+{% block content %}
+<h2>{{ soldier.rank_and_name }}, Gaining Unit Rep</h2>
+{% if soldier.BN %}
+    <h3>{{ soldier.BN }}</h3>
+{% endif %}
+{% if soldier.unit %}
+    <h3>{{ soldier.unit }}</h3>
+{% endif %}
+<h3>Role: {{ soldier.role }}</h3>
+<p><img src="{{ soldier.gaining_user.image_url }}" class="detail-profile-image"></p>
+<p>Rank: {{ soldier.gaining_user.rank }}</p>
+<p>First Name: {{ soldier.gaining_user.first_name }}</p>
+<p>Last Name: {{ soldier.gaining_user.last_name }}</p>
+<p>email: {{ soldier.gaining_user.email }}</p>
+<p>phone: {{ soldier.gaining_user.phone_number }}</p>
+<p>Brigade: {{ soldier.BDE }}</p>
+<p>Battalion: {{ soldier.BN }}</p>
+<p>Unit: {{ soldier.unit }}</p>
+<br>
+<p>Bio: {{ soldier.gaining_user.bio }}</p>
+<p>Last Login: {{ soldier.gaining_user.last_login.strftime('%d %B %Y')  }}</p>
+<hr>
+<p>Username: {{ soldier.username }}</p>
+<div class="bg">
+    {% if messages != None %}
+      <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+        <div class="col-md-6" style="max-width: 600px;">
+          <ul class="list-group no-hover" id="messages">
+            {% for message in messages %}
+            <li class="list-group-item">
+              <a href="{{ url_for('show_user', user_id=message.user.id) }}">
+                <img src="{{ message.user.image_url }}" alt="" class="timeline-image">
+              </a>
+              <div class="message-area">
+                <div class="message-heading">
+                  <a href="{{ url_for('show_user', user_id=message.user.id) }}">@{{ message.user.username }}</a>
+                </div>
+                <p class="single-message">
+                  <b>{{ message.text }}</b>
+                  <a href="{{ url_for('delete_message', message_id=message.id) }}">Delete</a>
+                </p>
+                <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <hr>
+<div>
+    <p>
+        <button class="button-style" onclick="location.href='/users/edit/{{ soldier.username }}';">
+            Edit Profile
+        </button>
+    </p>
+    <p>
+        <button class="button-style" id="delete-btn" onclick="location.href='/logout';">
+            Logout
+        </button>
+    </p>
+</div>
+<br>
+<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}" class="link-style">Delete account?</a></p>
+{% endblock %}

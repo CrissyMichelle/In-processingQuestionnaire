@@ -2,20 +2,87 @@
 {% extends 'base.html' %}
 {% block title %}User Details{% endblock %}
 {% block content %}
-<h2>{{ soldier.rank_and_name }}, Replacement Company Details</h2>
-<p>Rank: {{ soldier.rank }}</p>
-<p>First Name: {{ soldier.first_name }}</p>
-<p>Last Name: {{ soldier.last_name }}</p>
-<p>email: {{ soldier.app_user.email }}</p>
-<p>phone: {{ soldier.phone_number }}</p>
+<div class="sidebar-wrapper">
+    <div class="sidebar">
+        <p><a href="https://smartvoucher.dfas.mil/voucher/login">MyPay Smart Voucher</a></p>
+        <p><img src="{{ url_for('static', filename='images/qr_code.png')}}" alt="QR Code to Smart Voucher Portal"></p>
+    </div>
+</div>
+<h2>{{ soldier.rank_and_name }}, Incoming Soldier Details</h2>
+<p><img src="{{ soldier.incoming_user.image_url }}" class="detail-profile-image"></p>
+<p>Rank: {{ soldier.incoming_user.rank }}</p>
+<p>First Name: {{ soldier.incoming_user.first_name }}</p>
+<p>Last Name: {{ soldier.incoming_user.last_name }}</p>
 <p>Arrival Date: {{ soldier.arrival_datetime }}</p>
 <p>Report to Bldg 1020, @0845 on: {{ soldier.report_bldg1020 }}</p>
+<p>email: {{ soldier.incoming_user.email }}</p>
+<p>phone: {{ soldier.incoming_user.phone_number }}</p>
+<br>
+<p>Role: {{ soldier.role }}</p>
+<p>Bio: {{ soldier.incoming_user.bio }}</p>
+<p>Last Login: {{ soldier.incoming_user.last_login.strftime('%d %B %Y')  }}</p>
 <hr>
-
 <p>Username: {{ soldier.username }}</p>
+<div class="bg">
+  {% if messages != None %}
+    <div class="row justify-content-center" style="display: flex; flex-direction: row; justify-content: center;">
+      <div class="col-md-6" style="max-width: 600px;">
+        <ul class="list-group no-hover" id="messages">
+          {% for message in messages %}
+          <li class="list-group-item">
+            <a href="{{ url_for('show_user', user_id=message.user.id) }}">
+              <img src="{{ message.user.image_url }}" alt="" class="timeline-image">
+            </a>
+            <div class="message-area">
+              <div class="message-heading">
+                <a href="{{ url_for('show_user', user_id=message.user.id) }}">@{{ message.user.username }}</a>
+              </div>
+              <p class="single-message">
+                <b>{{ message.text }}</b>
+                <a href="{{ url_for('delete_message', message_id=message.id) }}">Delete</a>
+              </p>
+              <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+</div>
+<hr>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+      <form action="/post_aar" method="POST">
+        {{ form.csrf_token }}
+        <div>
+          {% if form.text.errors %}
+            {% for error in form.text.errors %}
+              <span class="text-danger">
+            {{ error }}
+          </span>
+            {% endfor %}
+          {% endif %}
+          {{ form.text(placeholder="Send your Sustain/Improve suggestions directly to Reception Company!", class="form-control", rows="3") }}
+        </div>
+        <button class="btn btn-outline-success btn-block">Submit</button>
+      </form>
+    </div>
+  </div>
 <div>
-    <p><a href="/logout">Logout</a></p>
+    <p>
+        <button class="button-style" onclick="location.href='/users/edit/{{ soldier.username }}';">
+            Edit Profile
+        </button>
+    </p>
+    <p>
+        <button class="button-style" id="delete-btn" onclick="location.href='/logout';">
+            Logout
+        </button>
+    </p>
 </div>
 <br>
-<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}">Delete account?</a></p>
+<p><a href="{{ url_for('show_delete_page', username=soldier.username) }}" class="link-style">Delete account?</a></p>
+
+<script src="{{ url_for('static', filename='/js/sticky.js') }}"></script>
 {% endblock %}

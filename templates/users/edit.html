@@ -1,0 +1,37 @@
+<!--Inherits from the base template-->
+{% extends 'base.html' %}
+{% block title %}Edit User{% endblock %}
+{% block content %}
+<h2>{{ soldier.rank_and_name }}, Edit Your Profile</h2>
+<div class="form-container">
+  <form method="POST" id="edit_user">
+      {{ form.hidden_tag() }}
+
+      {% for field in form if field.widget.input_type != 'hidden' and field.name != 'password' %}
+        {% for error in field.errors %}
+          <div class="server-side-warning">{{ error }}</div>
+        {% endfor %}
+        {% if field.name != 'alt_email' %}
+          {{ field(placeholder=field.label.text, class="form-control") }}
+        {% elif field.name == 'alt_email'and soldier.type == 'cadre' %}
+        <!-- Display the alternative email field for cadre only -->
+          {{ field(placeholder=field.label.text, class="form-control") }}
+        {% endif %}
+      {% endfor %}
+
+      <p>To confirm changes, enter your password:</p>
+      {% if form.password.errors %}
+        {% for error in form.password.errors %}
+          <div class="server-side-warning">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+      {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
+
+      <div class="edit-btn-area">
+        <button class="btn btn-success">Edit this user!</button>
+        <a href="{{ url_for('cancel_edit') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+  </form>
+</div>
+<script src="{{ url_for('static', filename='js/form_phone.js') }}"></script>
+{% endblock %}
