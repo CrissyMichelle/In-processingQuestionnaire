@@ -6,3 +6,4 @@ templates/.DS_Store
 venv/
 new_venv/
 venv309/
+*.log
