@@ -35,8 +35,16 @@ class ArrivalForm(FlaskForm):
 
     # custom validator for dodid field
     def validate_dodid_length(form, field):
-        if len(str(field.data)) != 10:
+        """Convert field data (should be integers) into a string
+        and validate length"""
+        field_data_str = str(field.data)
+
+        if not field_data_str.isnumeric():
             raise ValidationError('Please enter your DODID as numbers only.')
+
+        if len(field_data_str) != 10:
+            raise ValidationError('Your DODID should be 10 digits.')
+        
     # Arrival date and time
     datetime = HTML5DateTimeField('1.Arrival Date and Time:', validators=[DataRequired()])
     

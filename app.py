@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-# from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
+from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
@@ -17,12 +17,13 @@ app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 # logging.basicConfig(level=logging.INFO)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
+"""Use local 'inprocessing' db for development"""
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 
-app.config["SECRET_KEY"] = os.environ.get('SECRET_KEY')
+app.config["SECRET_KEY"] = SECRET_KEY
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
@@ -33,7 +34,7 @@ app.config['MAIL_PORT'] = '587'
 # app.config['MAIL_USERNAME'] = 'crissymichelle@proton.me'
 app.config['MAIL_USERNAME'] = 'apikey'
 # app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_PASSWORD'] = os.environ.get('SEND_GRID')
+app.config['MAIL_PASSWORD'] = SEND_GRID
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
@@ -58,7 +59,7 @@ def signup_form():
     if "username" in session:
         flash(f"Sorry. {session['username']} needs to logout!", 'danger')
         return redirect("/logout")
-    
+    # TODO: ensure a logged-in user cannot create a new user
     form = CreateUserForm()
 
     if form.is_submitted() and form.validate():
@@ -93,7 +94,7 @@ def authorize_gainer_type():
     if "username" in session:
         flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
         return redirect("/logout")
-    
+    # TODO: ensure a logged-in user cannot create a new user
     form = CreateUserForm()
     entered_code = None
     correct_code = 'Ro11ing@long'
@@ -133,7 +134,7 @@ def authorize_cadre_type():
     if "username" in session:
         flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
         return redirect("/logout")
-    
+    # TODO: ensure a logged-in user cannot create a new user
     form = CreateUserForm()
     entered_code = None
     correct_code = 'R3cept!'
@@ -296,7 +297,8 @@ def page_for_inproc_users():
             incoming_user.first_name = f_name
             incoming_user.last_name = l_name
             incoming_user.phone_number = telephone
-
+            # TODO: ensure that rank, f_andl_names, and phone_number 
+            # link with inherited base User before committing to db
             db.session.commit()
 
         except IntegrityError:
@@ -470,7 +472,7 @@ def send_email():
 
     form = AuthGetEmail()
     entered_code = None
-    correct_code = os.environ.get('GET_EMAIL')
+    correct_code = GET_EMAIL
 
     if form.is_submitted() and form.validate():
         entered_code = form.code.data
@@ -792,7 +794,7 @@ def email_suggestions():
 
     form = AuthGetAARs()
     entered_code = None
-    correct_code = os.environ.get('GET_AARs')
+    correct_code = GET_AARs
 
     if form.is_submitted() and form.validate():
         entered_code = form.code.data
