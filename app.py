@@ -5,7 +5,6 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-# from key import GOOGLE_MAPS_KEY, SECRET_KEY, SQLALCHEMY_DATABASE_URI, MAIL_PASSWORD, GET_EMAIL, SEND_GRID, GET_AARs
 from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
