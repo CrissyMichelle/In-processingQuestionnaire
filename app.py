@@ -14,8 +14,9 @@ import pandas as pd
 from openpyxl import Workbook
 
 app = Flask(__name__)
-app.logger.setLevel(logging.DEBUG)
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s: %(message)s')
+logging.debug("Logging begun at debug level.")
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///inprocessing'
@@ -37,23 +38,39 @@ app.config['MAIL_PASSWORD'] = os.environ.get('SEND_GRID')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
+logging.debug(app.config)
+
 with app.app_context():
+    logging.debug("Preparing mail handler...")
     mail = Mail(app)
+    logging.debug("Mail handler ready.")
+    logging.debug("Preparing database connection...")
     connect_db(app)
+    logging.debug("Database connection ready.")
+    logging.debug("Preparing database tables...")
     db.create_all()
+    logging.debug("Database tables ready.")
+
 
 ################################# User create/login Routes ################################
+logging.debug("Reading user create/login routes...")
+
+
 @app.route("/")
 def to_register():
     """Redirects to page with registration form"""
+    logging.debug("Now running: to_register()")
     if "username" in session:
         return redirect("/logout")
     else:
         return redirect("/register")
 
+
 @app.route("/register", methods=["GET", "POST"])
 def signup_form():
     """Shows form for registering/creating a new user and handles submission."""
+    logging.debug("Now running: signup_form()")
+
     # but first, logged in users can't create a new user
     if "username" in session:
         flash(f"Sorry. {session['username']} needs to logout!", 'danger')
@@ -85,10 +102,12 @@ def signup_form():
 
     else:
         return render_template("register.html", form=form)
-    
+
+
 @app.route("/auth_gainer", methods=["GET", "POST"])
 def authorize_gainer_type():
     """Shows modal for verifying gainer user type"""
+    logging.debug("Now running: authorize_gainer_type()")
 
     if "username" in session:
         flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
@@ -126,9 +145,11 @@ def authorize_gainer_type():
         
     return render_template("auth_gainer.html", form=form)
 
+
 @app.route("/auth_cadre", methods=["GET", "POST"])
 def authorize_cadre_type():
     """Shows modal for verifying cadre user type"""
+    logging.debug("Now running: authorize_cadre_type()")
 
     if "username" in session:
         flash(f"{session['username']} might need to logout. Or try viewing 'Soldier Profile' from the nav bar.")
@@ -166,9 +187,11 @@ def authorize_cadre_type():
         
     return render_template("auth_cadre.html", form=form)
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login_form():
     """Shows form for logging in users and handles form submission"""
+    logging.debug("Now running: login_form()")
 
     if "username" in session:
         flash(f"{session['username']} is already logged in!")
@@ -197,9 +220,12 @@ def login_form():
         
     return render_template("login.html", form=form)
 
+
 @app.route("/logout")
 def logout():
     """Clears the browser session of username and redirects after grabbing logout time"""
+    logging.debug("Now running: logout()")
+
     try:
         username = session['username']
 
@@ -212,10 +238,15 @@ def logout():
     except KeyError:
         return redirect("/register")
 
-################################ Form Routes for Inherited User Types ################################    
+
+################################ Form Routes for Inherited User Types ################################
+logging.debug("Reading form routes for inherited user types...")
+
+
 @app.route("/questionnaire", methods=["GET", "POST"])
 def page_for_inproc_users():
     """Show and handle Reception Company's incoming personnel questionaire"""
+    logging.debug("Now running: page_for_inproc_users()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -317,9 +348,11 @@ def page_for_inproc_users():
 
     return render_template("questionnaire.html", form=form)
 
+
 @app.route("/gainers_form", methods=["GET", "POST"])
 def page_for_gaining_users():
     """Show and handle form for user type receiving personnel, 'gainers'."""
+    logging.debug("Now running: page_for_gaining_users()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -375,9 +408,11 @@ def page_for_gaining_users():
 
     return render_template("g-form.html", form=form)
 
+
 @app.route("/cadre_form", methods=["GET", "POST"])
 def page_for_cadre_users():
     """Show and handle form for cadre user type"""
+    logging.debug("Now running: page_for_cadre_users()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -430,9 +465,11 @@ def page_for_cadre_users():
 
     return render_template("c-form.html", form=form)
 
+
 @app.route("/post_aar", methods=["POST"])
 def post_aar():
     """Commit aar comment to database"""
+    logging.debug("Now running: post_aar()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -457,9 +494,11 @@ def post_aar():
         flash("Routing error.", "danger")
         return redirect("/resources")
 
+
 @app.route("/send_email", methods=["GET", "POST"])
 def send_email():
     """Send email to logged in cadre member"""
+    logging.debug("Now running: send_email()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -534,10 +573,15 @@ def send_email():
     
     return render_template("send_email.html", form=form)
 
+
 ################################ User Profile Routes ################################
+logging.debug("Reading user profile routes...")
+
+
 @app.route("/users/<username>")
 def show_user_deets(username):
     """Info page for logged-in-users"""
+    logging.debug("Now running: show_user_deets()")
 
     if "username" not in session or username != session['username']:
         flash("Please login or create a new user account.")
@@ -555,9 +599,11 @@ def show_user_deets(username):
         flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/questionnaire")
 
+
 @app.route("/users/gaining/<username>")
 def show_gaining_user(username):
     """Info page for logged-in g-users"""
+    logging.debug("Now running: show_gaining_user()")
 
     if "username" not in session or username != session['username']:
         flash("Please login or create a new user account.")
@@ -573,9 +619,11 @@ def show_gaining_user(username):
         flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/gainers_form")
 
+
 @app.route("/users/cadre/<username>")
 def show_cadre_user(username):
     """Info page for logged-in cadre members"""
+    logging.debug("Now running: show_cadre_user()")
 
     if "username" not in session or username != session['username']:
         flash("Please login or create a new user account.")
@@ -593,9 +641,11 @@ def show_cadre_user(username):
         flash(f"Oops. {e}.. Please fill out the form.")
         return redirect("/cadre_form")
 
+
 @app.route("/users/profile")
 def show_profile_page():
     """Redirect to user's profile details"""
+    logging.debug("Now running: show_profile_page()")
 
     if "username" in session:
         username = session['username']
@@ -615,9 +665,11 @@ def show_profile_page():
         flash("Please login or create a new user account.")
         return redirect("/register")
 
+
 @app.route("/users/edit/<username>", methods=["GET", "POST"])
 def edit_profile(username):
     """Update profile for current user"""
+    logging.debug("Now running: edit_profile()")
 
     if "username" not in session or username != session['username']:
         flash("Please login or create a new user account.")
@@ -669,17 +721,21 @@ def edit_profile(username):
     
     else:
         return render_template("users/edit.html", form=form, soldier=u)
-    
+
+
 @app.route('/cancel_edit')
 def cancel_edit():
     """Provides flash message for user's cancellation of edits"""
+    logging.debug("Now running: cancel_edit()")
 
     flash("Editing canceled")
     return redirect("/users/profile")
 
+
 @app.route('/get_all_users')
 def list_users():
     """Pass every user from db to front end"""
+    logging.debug("Now running: list_users()")
 
     all_incoming = NewSoldier.query.all()
     incoming_names = [{"name": incoming.rank_and_name, "id": incoming.incoming_user.id} for incoming in all_incoming]
@@ -701,6 +757,7 @@ def list_users():
 @app.route('/users/show/<int:user_id>')
 def show_user(user_id):
     """Shows user profile and user's messages"""
+    logging.debug("Now running: show_user()")
 
     if "username" not in session:
         flash("Please login!", "danger")
@@ -713,9 +770,11 @@ def show_user(user_id):
     
     return render_template('users/show.html', user=user, messages=messages)
 
+
 @app.route("/users/<username>/delete", methods=["GET", "POST"])
 def show_delete_page(username):
     """Show page for deletion based on logged in username in session"""
+    logging.debug("Now running: show_delete_page()")
 
     if "username" not in session or username != session['username']:
          raise Unauthorized()
@@ -736,12 +795,17 @@ def show_delete_page(username):
 
     return render_template("/users/delete.html", soldier=s)
 
+
 ################################# Extras ################################
+logging.debug("Reading extras...")
+
+
 @app.route('/messages/new', methods=["GET", "POST"])
 def messages_add():
     """Add a message:
     Show form if GET. If valid, update message and redirect to show messages page.
     """
+    logging.debug("Now running: messages_add()")
 
     if "username" not in session:
         flash("You must be logged in to see messages!", "danger")
@@ -762,9 +826,11 @@ def messages_add():
 
     return render_template('messages/new.html', form=form)
 
+
 @app.route('/messages/show')
 def show_messages():
     """Render page showing all messages"""
+    logging.debug("Now running: show_messages()")
 
     if "username" not in session:
         flash("You must be logged in to see messages!", "danger")
@@ -779,9 +845,11 @@ def show_messages():
 
     return render_template('messages/show.html', messages=messages, user=app_user, form=form)                                                         
 
+
 @app.route("/email_suggestions", methods=["GET", "POST"])
 def email_suggestions():
     """Send email with AAR comments"""
+    logging.debug("Now running: email_suggestions")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -835,9 +903,11 @@ def email_suggestions():
     
     return render_template("email_aars.html", form=form)
 
+
 @app.route("/delete_message/<int:message_id>")
 def delete_message(message_id):
     """Allow logged-in user to delete their messages"""
+    logging.debug("Now running: delete_message()")
 
     if "username" not in session:
         flash("Please login or create a new user account.")
@@ -857,9 +927,11 @@ def delete_message(message_id):
     flash("Message deleted.")
     return redirect("/users/profile")
 
+
 @app.route("/resources", methods=["GET", "POST"])
 def show_useful_links():
     """Show page with links and API functionality"""
+    logging.debug("Now running: show_useful_links()")
 
     form = EnterEndpointForm()
     if request.method == "POST" and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -871,9 +943,11 @@ def show_useful_links():
     
     return render_template("links.html", form=form)
 
+
 @app.route("/api/directions")
 def get_directions_for_api_call():
     """Use API to get directions"""
+    logging.debug("Now running: get_directions_for_api_call()")
 
     start = request.args.get('origin')
     end = request.args.get('destination')
@@ -886,9 +960,11 @@ def get_directions_for_api_call():
 
     return jsonify(data)
 
+
 @app.route("/directions", methods=["GET", "POST"])
 def show_get_directions():
     """Render HTML page showing google map and form for api call.  Accepts parameters as query strings"""
+    logging.debug("Now running: show_get_directions")
 
     start = request.args.get('origin', 'Lyman Gate, HI')
     end = request.args.get('destination', '')
@@ -896,3 +972,10 @@ def show_get_directions():
 
     form = GetDirectionsForm()
     return render_template("directions.html", origin=start, destination=end, mode=mode, form=form)
+
+
+logging.info("Application is ready.")
+
+if __name__ == '__main__':
+    app.run()
+    # app.run(host='0.0.0.0', debug=True)
