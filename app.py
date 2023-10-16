@@ -9,7 +9,7 @@ from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Message
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
-import pandas as pd
+import pandas as pd  # using pandas dataframe to convert to excel
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -36,9 +36,10 @@ app.config['MAIL_PASSWORD'] = os.environ.get('SEND_GRID')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
-logging.debug(app.config)
+logging.debug(f"Config info: {app.config}")
 
 with app.app_context():
+    logging.debug(f"App info: {app}")
     logging.debug("Preparing mail handler...")
     mail = Mail(app)
     logging.debug("Mail handler ready.")
@@ -46,7 +47,7 @@ with app.app_context():
     connect_db(app)
     logging.debug("Database connection ready.")
     logging.debug("Preparing database tables...")
-    print(db)
+    logging.debug(f"db info: {db}")
     db.create_all()
     logging.debug("Database tables ready.")
 
@@ -974,7 +975,7 @@ def show_get_directions():
 
 
 logging.info("Application is ready.")
-
+logging.debug(f'__name__: {__name__}')
 if __name__ == '__main__':
     app.run()
     # app.run(host='0.0.0.0', debug=True)
