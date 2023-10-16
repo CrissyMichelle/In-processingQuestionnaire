@@ -25,24 +25,27 @@ Cadre.query.delete()
 GainingUser.query.delete()
 Messages.query.delete()
 
-# Create base User objects
-snuffle = User(username='snuffle23', password ='passWORD!!123', email="joe.q.snuffy.not@4real.com", type="incoming",
+# Create User objects
+# Create incoming User objects
+snuffle = User(username='snuffle23', password='passWORD!!123', email="joe.q.snuffy.not@4real.com", type="incoming",
                rank='PVT', first_name="Joe", last_name="Snuffy", phone_number='555-666-7474')
 
-wardawg = User(username='wardawg', password ='killKillKILL', email="claude.v.dayum.not@4real.com", type="incoming",
+wardawg = User(username='wardawg', password='killKillKILL', email="claude.v.dayum.not@4real.com", type="incoming",
                rank='SSG', first_name="Claude", last_name="Dayum")
 
-captain = User(username='cptO3', password ='cpt03', email="jack.b.reacher.not@4real.com", type="cadre",
+# Create cadre User objects
+captain = User(username='cptO3', password='cpt03', email="jack.b.reacher.not@4real.com", type="cadre",
                rank='CPT', first_name="Jack", last_name="Reacher", phone_number='808-555-5555')
-me = User(username='cmc', password ='123456', email="xxxxxx.x.xxxxxxx@notmail.com", type="cadre",
-               rank='SFC', first_name="Michelle", last_name="Cobra", phone_number='777-777-7777',
-               image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAL8dUDsl1jHCZ-BMdHXLm4FOexiZnf6KBSA&usqp=CAU',
-               bio='From a nice hometown, been in the Army 16 years, lifelong learner. I love using emerging tech to help out my fellow Soldiers!')
+me = User(username='cmc', password='123456', email="xxxxxx.x.xxxxxxx@notmail.com", type="cadre",
+          rank='SFC', first_name="Michelle", last_name="Cobra", phone_number='777-777-7777',
+          image_url='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAL8dUDsl1jHCZ-BMdHXLm4FOexiZnf6KBSA&usqp=CAU',
+          bio='From a nice hometown, been in the Army 16 years, lifelong learner. I love using emerging tech to help out my fellow Soldiers!')
 
-april = User(username='aprilmay93', password ='sfc23', email="april.o.neal.not@4real.com", type="gainers",
-               rank='SSG', first_name="April", last_name="ONeal", phone_number='610-999-0990')
-yody = User(username='yodyyolo', password ='654321', email="yannick.q.yaetz49.not@4real.com", type="gainers",
-               rank='SGT', first_name="Yan", last_name="Yaetz", phone_number='111-999-0990')
+# Create gainers User objects
+april = User(username='aprilmay93', password='sfc23', email="april.o.neal.not@4real.com", type="gainers",
+             rank='SSG', first_name="April", last_name="ONeal", phone_number='610-999-0990')
+yody = User(username='yodyyolo', password='654321', email="yannick.q.yaetz49.not@4real.com", type="gainers",
+            rank='SGT', first_name="Yan", last_name="Yaetz", phone_number='111-999-0990')
 
 # Add and commit the base User objects
 db.session.add(snuffle)

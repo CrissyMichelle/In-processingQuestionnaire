@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, redirect, flash, session, url_for, request, jsonify, current_app, abort
+from flask import Flask, render_template, redirect, flash, session, url_for, request, jsonify, current_app, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_mail import Mail, Message
 from werkzeug.exceptions import Unauthorized
@@ -10,7 +10,6 @@ from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEnd
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
 import pandas as pd
-from openpyxl import Workbook
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s: %(message)s')
@@ -47,6 +46,7 @@ with app.app_context():
     connect_db(app)
     logging.debug("Database connection ready.")
     logging.debug("Preparing database tables...")
+    print(db)
     db.create_all()
     logging.debug("Database tables ready.")
 
@@ -89,7 +89,7 @@ def signup_form():
             return render_template("register.html", form=form)
         
         # new users defined as 'incoming' by default
-        new_user = User.register(username=username, pwd=password, email=email, type='incoming')
+        new_user = User.register(username=username, pwd=password, email=email, user_type='incoming')
         db.session.add(new_user)
         db.session.commit()
         
@@ -129,7 +129,7 @@ def authorize_gainer_type():
                 flash("Username already taken, please choose another.")
                 return redirect("/register")
             
-            new_user = User.register(username=username, pwd=password, email=email, type='gainers')
+            new_user = User.register(username=username, pwd=password, email=email, user_type='gainers')
             db.session.add(new_user)
             db.session.commit()
            
@@ -171,7 +171,7 @@ def authorize_cadre_type():
                 flash("Username already taken, please choose another.")
                 return redirect("/register")
             
-            new_user = User.register(username=username, pwd=password, email=email, type='cadre')
+            new_user = User.register(username=username, pwd=password, email=email, user_type='cadre')
             db.session.add(new_user)
             db.session.commit()
             
@@ -258,7 +258,7 @@ def page_for_inproc_users():
         incoming_user = User.query.filter(User.username == username).one()
 
         # Airport arrival date
-        datetime = form.datetime.data
+        arrival_datetime = form.datetime.data
         # Rank and name
         rank = form.rank.data
         f_name = form.f_name.data
@@ -295,27 +295,27 @@ def page_for_inproc_users():
         hotels          = form.hotels.data
         
         # add newly-arrived Soldier data into database 
-        new_arrived = NewSoldier(arrival_datetime = datetime, report_bldg1020 = report, username = incoming_user.username,
-                                tele_recall     = tele_recall,
-                                DODID           = dodid,
-                                lose_UIC        = lose_UIC,
-                                gain_UIC        = gain_UIC,
-                                home_town       = home_town,
-                                known_sponsor   = known_sponsor,
-                                aar_comments    = [],
-                                in_proc_hours   = in_proc_hours,
-                                new_pt          = new_pt,
-                                uniform         = uniform,
-                                transpo         = transpo,
-                                orders          = orders,
-                                da31            = da31,
-                                pov             = pov,
-                                flight          = flight,
-                                mypay           = mypay,
-                                tdy             = tdy,
-                                gtc             = gtc,
-                                tla             = tla,
-                                hotels          = hotels)
+        new_arrived = NewSoldier(arrival_datetime = arrival_datetime, report_bldg1020 = report, username = incoming_user.username,
+                                 tele_recall     = tele_recall,
+                                 DODID           = dodid,
+                                 lose_UIC        = lose_UIC,
+                                 gain_UIC        = gain_UIC,
+                                 home_town       = home_town,
+                                 known_sponsor   = known_sponsor,
+                                 aar_comments    = [],
+                                 in_proc_hours   = in_proc_hours,
+                                 new_pt          = new_pt,
+                                 uniform         = uniform,
+                                 transpo         = transpo,
+                                 orders          = orders,
+                                 da31            = da31,
+                                 pov             = pov,
+                                 flight          = flight,
+                                 mypay           = mypay,
+                                 tdy             = tdy,
+                                 gtc             = gtc,
+                                 tla             = tla,
+                                 hotels          = hotels)
 
         db.session.add(new_arrived)
         try:
@@ -538,7 +538,7 @@ def send_email():
                                     user.incoming.gtc,
                                     user.incoming.tla,
                                     user.incoming.hotels) for user in user_data],
-                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
+                                   columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
                                             'Tele_recall', 'DODID', 'Losing_UIC', 'Gaining_UIC', 'Hometown', 'Known_Sponsor',
                                             'In_proc_Hours', 'Newcomer_PT', 'Duty_Uniform', 'Transpo',
                                             'PCS_orders', 'DA31', 'POV', 'Flight', 'MyPay', 'PTDY', 'GTC',
@@ -683,30 +683,30 @@ def edit_profile(username):
                 editing_user = User.query.get(u.id)
 
                 if form.email.data:    
-                    editing_user.email=form.email.data
+                    editing_user.email = form.email.data
                 if form.alt_email.data:
-                    editing_user.cadre.alt_email=form.alt_email.data
+                    editing_user.cadre.alt_email = form.alt_email.data
                 if form.rank.data != 'No Change':    
-                    editing_user.rank=form.rank.data
+                    editing_user.rank = form.rank.data
                 if form.f_name.data:    
-                    editing_user.first_name=form.f_name.data
+                    editing_user.first_name = form.f_name.data
                 if form.l_name.data:    
-                    editing_user.last_name=form.l_name.data
+                    editing_user.last_name = form.l_name.data
 
                 if form.role.data:
                     if editing_user.type == 'incoming':
-                        editing_user.incoming.role=form.role.data
+                        editing_user.incoming.role = form.role.data
                     elif editing_user.type == 'gainers':
-                        editing_user.gainers.role=form.role.data
+                        editing_user.gainers.role = form.role.data
                     elif editing_user.type == 'cadre':
-                        editing_user.cadre.role=form.role.data
+                        editing_user.cadre.role = form.role.data
 
                 if form.telephone.data:    
-                    editing_user.phone_number=form.telephone.data
+                    editing_user.phone_number = form.telephone.data
                 if form.image_url.data:
-                    editing_user.image_url=form.image_url.data
+                    editing_user.image_url = form.image_url.data
                 if form.bio.data:
-                    editing_user.bio=form.bio.data
+                    editing_user.bio = form.bio.data
 
                 db.session.commit()
                 flash("Profile updated!")
@@ -776,7 +776,7 @@ def show_delete_page(username):
     logging.debug("Now running: show_delete_page()")
 
     if "username" not in session or username != session['username']:
-         raise Unauthorized()
+        raise Unauthorized()
 
     s = User.query.filter(User.username == username).one()
     posts = s.messages
@@ -871,7 +871,7 @@ def email_suggestions():
             user_df = pd.DataFrame([(user.email, user.rank, user.first_name, user.last_name,
                                     user.phone_number, user.incoming.arrival_datetime, user.incoming.report_bldg1020,
                                     user.incoming.aar_comments) for user in user_data],
-                                    columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
+                                   columns=['Email', 'Rank', 'First', 'Last', 'Phone', 'Arrival_Date', 'Report_to_Reception',
                                             'AAR Comments'])
             # Create excel file
             excel_path = 'user_data.xlsx'
