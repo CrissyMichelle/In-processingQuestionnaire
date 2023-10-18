@@ -1,6 +1,10 @@
 .DS_Store
+.idea/
 __pycache__/
 key.py
 templates/.DS_Store
 venv/
 new_venv/
+venv*/
+
+*.log
