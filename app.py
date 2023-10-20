@@ -229,8 +229,8 @@ def logout():
     try:
         username = session['username']
 
-        s = User.query.filter(User.username == username).one()
-        s.last_login = datetime.utcnow()
+        user = User.query.filter(User.username == username).one()
+        user.last_login = datetime.utcnow()
         db.session.commit()
         
         session.pop("username")
