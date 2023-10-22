@@ -3,12 +3,14 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 
 bcrypt = Bcrypt()
-db =  SQLAlchemy()
+db = SQLAlchemy()
+
 
 def connect_db(app):
     """Wraps logic into a function connecting app to database"""
     db.app = app
     db.init_app(app)
+
 
 class User(db.Model):
     """Base class of common attributes shared by the tables inheriting User"""
@@ -16,9 +18,9 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20), unique=True)
-    password = db.Column(db.Text, nullable = False)
-    email = db.Column(db.String(50), nullable = False)
-    type = db.Column(db.Text, nullable = False)
+    password = db.Column(db.Text, nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.Text, nullable=False)
     rank = db.Column(db.Text)
     first_name = db.Column(db.Text)
     last_name = db.Column(db.Text)
@@ -34,19 +36,19 @@ class User(db.Model):
     gainUnit_userid = db.Column(db.Integer, db.ForeignKey('gainers.id', ondelete='cascade'))
 
     # SQLAlchemy associations
-    incoming = db.relationship('NewSoldier', backref=db.backref('incoming_user', uselist=False), foreign_keys=[newSoldier_id] )
+    incoming = db.relationship('NewSoldier', backref=db.backref('incoming_user', uselist=False), foreign_keys=[newSoldier_id])
     cadre = db.relationship('Cadre', backref=db.backref('cadre_user', uselist=False), foreign_keys=[cadre_id])
     gainers = db.relationship('GainingUser', backref=db.backref('gaining_user', uselist=False), foreign_keys=[gainUnit_userid])
     messages = db.relationship('Messages', backref='user')
 
     @classmethod
-    def register(cls, username, pwd, email, type):
+    def register(cls, username, pwd, email, user_type):
         """Register user with hashed password and return user"""
         hashed = bcrypt.generate_password_hash(pwd)
         # turn bytestring into normal unicode utf8 string
         hashed_utf8 = hashed.decode("utf8")
 
-        reg_user = cls(username=username, password=hashed_utf8, email=email, type=type)
+        reg_user = cls(username=username, password=hashed_utf8, email=email, type=user_type)
         db.session.add(reg_user)
         return reg_user
     
@@ -63,12 +65,13 @@ class User(db.Model):
     def rank_and_name(self):
         return self.rank + " " + self.last_name
 
+
 class NewSoldier(db.Model):
     """Models a new in-processing Soldier and inherits from User"""
     __tablename__ = 'incoming'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    arrival_datetime = db.Column(db.DateTime, nullable = False)
+    arrival_datetime = db.Column(db.DateTime, nullable=False)
     report_bldg1020 = db.Column(db.Date)
     role = db.Column(db.Text, default='incoming')
     username = db.Column(db.Text, db.ForeignKey('users.username', ondelete='cascade'))
@@ -122,6 +125,7 @@ class Cadre(db.Model):
     def rank_and_name(self):
         return self.cadre_user.rank + " " + self.cadre_user.last_name
 
+
 class GainingUser(db.Model):
     """Models a user from the gaining units"""
     __tablename__ = 'gainers'
@@ -136,6 +140,7 @@ class GainingUser(db.Model):
     @property
     def rank_and_name(self):
         return self.gaining_user.rank + " " + self.gaining_user.last_name
+
 
 class Messages(db.Model):
     """Model for mini-blog message posts"""

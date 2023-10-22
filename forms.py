@@ -7,17 +7,22 @@ from wtforms.widgets import Input
 # def validate(self, extra_validators=None):
 #     initial_validation = super(FlaskForm, self).validate(extra_validators)
 
+
 class HTML5DateField(StringField):
     """Render wtf DateField into a string for html purposes"""
     widget = Input(input_type='date')
+
+
 class HTML5DateTimeField(StringField):
     """Render wtf DateTimeField into a string for html purposes"""
     widget = Input(input_type='datetime-local')
+
 
 class CustomFieldParam(StringField):
     def __init__(self, *args, sub_label=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.sub_label = sub_label
+
 
 class ValidGeoLocation:
     """Validates input sent to Google Maps API"""
@@ -43,7 +48,7 @@ class ArrivalForm(FlaskForm):
     # Rank and name
     rank = SelectField("Rank:", validators=[InputRequired()],
                        choices=[('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
-                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
+                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'), ('MSG', 'MSG'), ('1SG', '1SG'),
                                 ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
                                 ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
                                 ('COL', 'COL'), ('BG', 'BG'), ('MG', 'MG'), ('LTG', 'LTG'), ('GEN', 'GEN'), ('GA', 'GA'),
@@ -133,12 +138,13 @@ class CreateUserForm(FlaskForm):
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired(), Length(min=6, message='Must be at least 6 characters long.')])
     email = StringField("email", validators=[InputRequired()])
-    
+
+
 class GainersForm(FlaskForm):
     """Form for adding new gaining-unit users"""
     rank = SelectField("Rank:", validators=[InputRequired()],
                        choices=[('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
-                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
+                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'), ('MSG', 'MSG'), ('1SG', '1SG'),
                                 ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
                                 ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
                                 ('COL', 'COL'), ('BG', 'BG'), ('MG', 'MG'), ('LTG', 'LTG'), ('GEN', 'GEN'), ('GA', 'GA'),
@@ -152,11 +158,12 @@ class GainersForm(FlaskForm):
     telephone = StringField('Contact Phone Number (XXX-XXX-XXXX):',
                             validators=[DataRequired(), Regexp(r'^\d{3}-\d{3}-\d{4}$',message="Please enter a valid telephone number in the format XXX-XXX-XXXX.")])
 
+
 class CadreForm(FlaskForm):
     """Form for adding cadre users"""
     rank = SelectField("Rank:", validators=[InputRequired()],
                        choices=[('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
-                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
+                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'), ('MSG', 'MSG'), ('1SG', '1SG'),
                                 ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
                                 ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
                                 ('COL', 'COL'), ('BG', 'BG'), ('MG', 'MG'), ('LTG', 'LTG'), ('GEN', 'GEN'), ('GA', 'GA'),
@@ -174,9 +181,11 @@ class LoginForm(FlaskForm):
     username = StringField("user name", validators=[InputRequired()])
     password = PasswordField("password", validators=[InputRequired()])
 
+
 class EnterEndpointForm(FlaskForm):
     """Form for selecting endpoint"""
     destination = StringField("Destination: ", validators=[InputRequired()])
+
 
 class GetDirectionsForm(FlaskForm):
     """Form for Google Maps API"""
@@ -186,13 +195,16 @@ class GetDirectionsForm(FlaskForm):
                              choices=[("DRIVING", "Driving"), ("WALKING", "Walking"), ("BICYCLING", "Biking"),
                                       ("TRANSIT", "Public Transit")])
     
+
 class MessageForm(FlaskForm):
     """Form for adding/editing messages"""
     text = TextAreaField('text', validators=[DataRequired()])
-    
+
+
 class AARcommentsForm(FlaskForm):
     """Form for giving feedback to Reception Co."""
     text = TextAreaField('text', validators=[DataRequired()])
+
 
 class EditUserForm(FlaskForm):
     """Form for editing user profiles"""
@@ -201,7 +213,7 @@ class EditUserForm(FlaskForm):
     alt_email = StringField('Alternative or civilian email')
     rank = SelectField("Rank:", validators=[InputRequired()],
                        choices=[('No Change', 'rank --No Change--'), ('PVT', 'PVT'), ('PV2', 'PV2'), ('PFC', 'PFC'), ('SPC', 'SPC'), ('CPL', 'CPL'),
-                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'),( 'MSG', 'MSG'), ('1SG', '1SG'),
+                                ('SGT', 'SGT'), ('SSG', 'SSG'), ('SFC', 'SFC'), ('MSG', 'MSG'), ('1SG', '1SG'),
                                 ('SGM', 'SGM'), ('CSM', 'CSM'), ('SMA', 'SMA'),
                                 ('2LT', '2LT'), ('1LT', '1LT'), ('CPT', 'CPT'), ('MAJ', 'MAJ'), ('LTC', 'LTC'),
                                 ('COL', 'COL'), ('BG', 'BG'), ('MG', 'MG'), ('LTG', 'LTG'), ('GEN', 'GEN'), ('GA', 'GA'),
@@ -215,11 +227,13 @@ class EditUserForm(FlaskForm):
     
     password = PasswordField('Password', validators=[Length(min=6)])
 
+
 class AuthGetEmail(FlaskForm):
     """Form authorizing email with spreadsheet"""
 
     code = PasswordField("Enter access code", validators=[DataRequired()])
     submit = SubmitField("Email spreadsheet")
+
 
 class AuthGetAARs(FlaskForm):
     """Form authorizing email with spreadsheet"""
