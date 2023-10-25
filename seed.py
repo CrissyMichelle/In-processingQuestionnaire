@@ -1,5 +1,5 @@
 """Seed file to make sample data for inprocessing database"""
-from models import User, NewSoldier, Cadre, GainingUser, Messages, db
+from models import User, NewSoldier, Cadre, GainingUser, Messages, Notification, db
 from sqlalchemy import text
 from app import app
 from datetime import datetime
@@ -123,6 +123,17 @@ message3 = Messages(text="you is the best", timestamp=datetime(2023, 8, 23, 16, 
 db.session.add(message3)
 message4 = Messages(text="YODY!!", timestamp=datetime(2023, 9, 7, 15, 21), user_id=yody.id)
 db.session.add(message4)
+db.session.commit()
+
+notification1 = Notification(text="This is a test for user 1", user_id=1)
+notification2 = Notification(text="This is a test for user 2", user_id=2)
+notification3 = Notification(text="This is a test for user 3", user_id=3)
+notification4 = Notification(text="This is a test for user 4", user_id=4)
+db.session.add(notification1)
+db.session.add(notification2)
+db.session.add(notification3)
+db.session.add(notification4)
+
 db.session.commit()
 
 

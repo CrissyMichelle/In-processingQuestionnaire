@@ -5,7 +5,7 @@ from werkzeug.exceptions import Unauthorized
 from sqlalchemy import and_, or_
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages
+from models import db, connect_db, User, NewSoldier, Cadre, GainingUser, Messages, Notification
 from forms import ArrivalForm, CreateUserForm, LoginForm, EditUserForm, EnterEndpointForm, GetDirectionsForm, GainersForm, CadreForm, MessageForm, AuthGetEmail, AARcommentsForm, AuthGetAARs
 import logging, datetime, traceback, sys, pdb, requests, os
 from datetime import datetime
@@ -794,6 +794,25 @@ def show_delete_page(username):
         return redirect("/login")
 
     return render_template("/users/delete.html", soldier=s)
+
+
+@app.route("/notifications", methods=["GET", "POST"])
+def show_notifications():
+    """show notifications"""
+    logging.debug("Now running: show_notifications()")
+
+    if "username" not in session:
+        flash("Please login!", "danger")
+        return redirect("/login")
+
+    username = session["username"]
+    user_id = User.query.filter(User.username == username).one().id
+
+    notifications = Notification.query.filter(Notification.user_id == user_id).all()
+    logging.debug(f"user_id:{user_id}, notifications:{notifications}")
+
+    return render_template('notifications.html', notifications=notifications)
+
 
 
 ################################# Extras ################################

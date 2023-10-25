@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+
+<h3>Notifications</h3>
+<div class="container container-md">
+{% for notification in notifications %}
+    <div class="alert {% if notification.read %} alert-secondary {% else %} alert-primary {% endif %}">
+      {{notification.text}}
+    </div>
+{% endfor %}
+</div>
+{% endblock %}
